@@ -1,11 +1,12 @@
 import {useMutation, UseMutationResult, useQuery} from 'react-query';
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from './snippet.ts';
+import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../types/snippetType.ts';
 import {SnippetOperations} from "./snippetOperations.ts";
 import {PaginatedUsers} from "./users.ts";
-import {FakeSnippetOperations} from "./mock/fakeSnippetOperations.ts";
 import {TestCase} from "../types/TestCase.ts";
 import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
+import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
+import {SnippetManagerOperations} from "./snippetManagerOperations.ts";
 // import {useAuth0} from "@auth0/auth0-react";
 // import {useEffect} from "react";
 
@@ -21,7 +22,7 @@ export const useSnippetsOperations = () => {
   //         .catch(error => console.error(error));
   // });
 
-  const snippetOperations: SnippetOperations = new FakeSnippetOperations(/* getAccessTokenSilently */); // TODO: Replace with your implementation
+  const snippetOperations: SnippetOperations = new SnippetManagerOperations()
 
   return snippetOperations
 }
@@ -35,25 +36,25 @@ export const useGetSnippets = (page: number = 0, pageSize: number = 10, snippetN
 export const useGetSnippetById = (id: string) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<Snippet | undefined, Error>(['snippet', id], () => snippetOperations.getSnippetById(id), {
+  return useQuery<SnippetType | undefined, Error>(['snippet', id], () => snippetOperations.getSnippetById(id), {
     enabled: !!id, // This query will not execute until the id is provided
   });
 };
 
-export const useCreateSnippet = ({onSuccess}: {onSuccess: () => void}): UseMutationResult<Snippet, Error, CreateSnippet> => {
+export const useCreateSnippet = ({onSuccess}: {onSuccess: () => void}): UseMutationResult<CreateSnippetResponse, Error, CreateSnippet> => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<Snippet, Error, CreateSnippet>(createSnippet => snippetOperations.createSnippet(createSnippet), {onSuccess});
+  return useMutation<CreateSnippetResponse, Error, CreateSnippet>(createSnippet => snippetOperations.createSnippet(createSnippet), {onSuccess});
 };
 
-export const useUpdateSnippetById = ({onSuccess}: {onSuccess: () => void}): UseMutationResult<Snippet, Error, {
+export const useUpdateSnippetById = ({onSuccess}: {onSuccess: () => void}): UseMutationResult<CreateSnippetResponse , Error, {
   id: string;
-  updateSnippet: UpdateSnippet
+  input: UpdateSnippet
 }> => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<Snippet, Error, { id: string; updateSnippet: UpdateSnippet }>(
-      ({id, updateSnippet}) => snippetOperations.updateSnippetById(id, updateSnippet),{
+  return useMutation<CreateSnippetResponse, Error, { id: string; input: UpdateSnippet }>(
+      ({input}) => snippetOperations.updateSnippetById(input),{
         onSuccess,
     }
   );
@@ -68,7 +69,7 @@ export const useGetUsers = (name: string = "", page: number = 0, pageSize: numbe
 export const useShareSnippet = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<Snippet, Error, { snippetId: string; userId: string }>(
+  return useMutation<SnippetType, Error, { snippetId: string; userId: string }>(
       ({snippetId, userId}) => snippetOperations.shareSnippet(snippetId, userId)
   );
 };

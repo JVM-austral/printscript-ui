@@ -1,4 +1,4 @@
-import {ComplianceEnum, CreateSnippet, Snippet, UpdateSnippet} from '../snippet'
+import {ComplianceEnum, CreateSnippet, SnippetType, UpdateSnippet} from '../../types/snippetType.ts'
 import {v4 as uuid} from 'uuid'
 import {PaginatedUsers} from "../users.ts";
 import {TestCase} from "../../types/TestCase.ts";
@@ -6,38 +6,41 @@ import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
 
-const INITIAL_SNIPPETS: Snippet[] = [
+const INITIAL_SNIPPETS: SnippetType[] = [
   {
     id: '9af91631-cdfc-4341-9b8e-3694e5cb3672',
     name: 'Super Snippet',
-    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    snippet: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'pending',
     author: 'John Doe',
     language: 'printscript',
-    extension: 'prs'
+    description: 'mock',
+    version: 'V1'
   },
   {
     id: 'c48cf644-fbc1-4649-a8f4-9dd7110640d9',
     name: 'Extra cool Snippet',
-    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    snippet: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'not-compliant',
     author: 'John Doe',
+    description: 'mock',
     language: 'printscript',
-    extension: 'prs'
+    version: 'V1'
   },
   {
     id: '34bf4b7a-d4a1-48be-bb26-7d9a3be46227',
     name: 'Boaring Snippet',
-    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    snippet: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'compliant',
     author: 'John Doe',
+    description: 'mock',
     language: 'printscript',
-    extension: 'prs'
+    version: 'V1'
   }
 ]
 
 const paginatedUsers: PaginatedUsers = {
-  count: 5,
+  total: 5,
   page: 1,
   page_size: 10,
   users: [
@@ -158,7 +161,7 @@ const fileTypes: FileType[] = [
 ]
 
 export class FakeSnippetStore {
-  private readonly snippetMap: Map<string, Snippet> = new Map()
+  private readonly snippetMap: Map<string, SnippetType> = new Map()
   private readonly testCaseMap: Map<string, TestCase> = new Map()
   private formattingRules: Rule[] = [];
   private lintingRules: Rule[] = [];
@@ -175,11 +178,11 @@ export class FakeSnippetStore {
     this.lintingRules = INITIAL_LINTING_RULES
   }
 
-  listSnippetDescriptors(): Snippet[] {
+  listSnippetDescriptors(): SnippetType[] {
     return Array.from(this.snippetMap, ([, value]) => value)
   }
 
-  createSnippet(createSnippet: CreateSnippet): Snippet {
+  createSnippet(createSnippet: CreateSnippet): SnippetType {
     const id = uuid();
     const newSnippet = {
       id,
@@ -192,11 +195,11 @@ export class FakeSnippetStore {
     return newSnippet
   }
 
-  getSnippetById(id: string): Snippet | undefined {
+  getSnippetById(id: string): SnippetType | undefined {
     return this.snippetMap.get(id)
   }
 
-  updateSnippet(id: string, updateSnippet: UpdateSnippet): Snippet {
+  updateSnippet(id: string, updateSnippet: UpdateSnippet): SnippetType {
     const existingSnippet = this.snippetMap.get(id)
 
     if (existingSnippet === undefined)

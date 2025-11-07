@@ -18,7 +18,7 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism-okaidia.css";
 import {Save} from "@mui/icons-material";
-import {CreateSnippet, CreateSnippetWithLang} from "../../utils/snippet.ts";
+import {CreateSnippet, CreateSnippetWithLang} from "../../types/snippetType.ts";
 import {ModalWrapper} from "../common/ModalWrapper.tsx";
 import {useCreateSnippet, useGetFileTypes} from "../../utils/queries.tsx";
 import {queryClient} from "../../App.tsx";
@@ -29,7 +29,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     defaultSnippet?: CreateSnippetWithLang
 }) => {
     const [language, setLanguage] = useState(defaultSnippet?.language ?? "printscript");
-    const [code, setCode] = useState(defaultSnippet?.content ?? "");
+    const [code, setCode] = useState(defaultSnippet?.snippet ?? "");
     const [snippetName, setSnippetName] = useState(defaultSnippet?.name ?? "")
     const {mutateAsync: createSnippet, isLoading: loadingSnippet} = useCreateSnippet({
         onSuccess: () => queryClient.invalidateQueries('listSnippets')
@@ -39,9 +39,10 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     const handleCreateSnippet = async () => {
         const newSnippet: CreateSnippet = {
             name: snippetName,
-            content: code,
+            snippet: code,
             language: language,
-            extension: fileTypes?.find((f) => f.language === language)?.extension ?? "prs"
+            description: '',
+            version: fileTypes?.find((f) => f.language === language)?.extension ?? "prs"
         }
         await createSnippet(newSnippet);
         onClose();
@@ -49,7 +50,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
 
     useEffect(() => {
         if (defaultSnippet) {
-            setCode(defaultSnippet?.content)
+            setCode(defaultSnippet?.snippet)
             setLanguage(defaultSnippet?.language)
             setSnippetName(defaultSnippet?.name)
         }

@@ -1,22 +1,23 @@
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from './snippet'
+import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../types/snippetType.ts'
 import {PaginatedUsers} from "./users.ts";
 import {TestCase} from "../types/TestCase.ts";
 import {TestCaseResult} from "./queries.tsx";
 import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
+import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
 
 export interface SnippetOperations {
   listSnippetDescriptors(page: number,pageSize: number,sippetName?: string): Promise<PaginatedSnippets>
 
-  createSnippet(createSnippet: CreateSnippet): Promise<Snippet>
+  createSnippet(createSnippet: CreateSnippet): Promise<CreateSnippetResponse>
 
-  getSnippetById(id: string): Promise<Snippet | undefined>
+  getSnippetById(id: string): Promise<SnippetType | undefined>
 
-  updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet>
+  updateSnippetById(updateSnippet: UpdateSnippet): Promise<CreateSnippetResponse>
 
   getUserFriends(name?: string,page?: number,pageSize?: number): Promise<PaginatedUsers>
 
-  shareSnippet(snippetId: string,userId: string): Promise<Snippet>
+  shareSnippet(snippetId: string,userId: string): Promise<SnippetType>
 
   getFormatRules(): Promise<Rule[]>
 

@@ -1,8 +1,6 @@
 import {useEffect, useState} from "react";
 import Editor from "react-simple-code-editor";
 import {highlight, languages} from "prismjs";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism-okaidia.css";
 import {Alert, Box, CircularProgress, IconButton, Tooltip, Typography} from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,30 +9,31 @@ import {
 } from "../utils/queries.tsx";
 import {useFormatSnippet, useGetSnippetById, useShareSnippet} from "../utils/queries.tsx";
 import {Bòx} from "../components/snippet-table/SnippetBox.tsx";
-import {BugReport, Delete, Download, Save, Share} from "@mui/icons-material";
+import {BugReport, Delete, Download, PlayArrow, Save, Share, StopRounded} from "@mui/icons-material";
 import {ShareSnippetModal} from "../components/snippet-detail/ShareSnippetModal.tsx";
 import {TestSnippetModal} from "../components/snippet-test/TestSnippetModal.tsx";
-import {Snippet} from "../utils/snippet.ts";
 import {SnippetExecution} from "./SnippetExecution.tsx";
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import {queryClient} from "../App.tsx";
 import {DeleteConfirmationModal} from "../components/snippet-detail/DeleteConfirmationModal.tsx";
+import {SnippetType} from "../types/snippetType.ts";
+import {useRunSnippet} from "../hooks/useRunSnippet.ts";
 
 type SnippetDetailProps = {
   id: string;
   handleCloseModal: () => void;
 }
 
-const DownloadButton = ({snippet}: { snippet?: Snippet }) => {
+const DownloadButton = ({snippet}: { snippet?: SnippetType }) => {
   if (!snippet) return null;
-  const file = new Blob([snippet.content], {type: 'text/plain'});
+  const file = new Blob([snippet.snippet], {type: 'text/plain'});
 
   return (
     <Tooltip title={"Download"}>
       <IconButton sx={{
         cursor: "pointer"
       }}>
-        <a download={`${snippet.name}.${snippet.extension}`} target="_blank"
+        <a download={`${snippet.name}.${snippet.version}`} target="_blank"
            rel="noreferrer" href={URL.createObjectURL(file)} style={{
           textDecoration: "none",
           color: "inherit",
@@ -53,7 +52,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   const [code, setCode] = useState(
       ""
   );
-  const [shareModalOppened, setShareModalOppened] = useState(false)
+  const [shareModalOpened, setShareModalOpened] = useState(false)
   const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false)
   const [testModalOpened, setTestModalOpened] = useState(false);
 
@@ -64,7 +63,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
 
   useEffect(() => {
     if (snippet) {
-      setCode(snippet.content);
+      setCode(snippet.snippet);
     }
   }, [snippet]);
 
@@ -74,6 +73,15 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
     }
   }, [formatSnippetData])
 
+  const { run, stop, isRunning} = useRunSnippet();
+
+  const handleRunClick = () => {
+    if (isRunning) {
+      stop();
+    } else {
+      run({ snippetId: id });
+    }
+  };
 
   async function handleShareSnippet(userId: string) {
     shareSnippet({snippetId: id, userId})
@@ -92,7 +100,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
             <Typography variant="h4" fontWeight={"bold"}>{snippet?.name ?? "Snippet"}</Typography>
             <Box display="flex" flexDirection="row" gap="8px" padding="8px">
               <Tooltip title={"Share"}>
-                <IconButton onClick={() => setShareModalOppened(true)}>
+                <IconButton onClick={() => setShareModalOpened(true)}>
                   <Share/>
                 </IconButton>
               </Tooltip>
@@ -102,11 +110,11 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                 </IconButton>
               </Tooltip>
               <DownloadButton snippet={snippet}/>
-              {/*<Tooltip title={runSnippet ? "Stop run" : "Run"}>*/}
-              {/*  <IconButton onClick={() => setRunSnippet(!runSnippet)}>*/}
-              {/*    {runSnippet ? <StopRounded/> : <PlayArrow/>}*/}
-              {/*  </IconButton>*/}
-              {/*</Tooltip>*/}
+              <Tooltip title={isRunning ? "Stop run" : "Run"}>
+                <IconButton onClick={() => handleRunClick()}>
+                  {isRunning ? <StopRounded/> : <PlayArrow/>}
+                </IconButton>
+              </Tooltip>
               {/* TODO: we can implement a live mode*/}
               <Tooltip title={"Format"}>
                 <IconButton onClick={() => formatSnippet(code)} disabled={isFormatLoading}>
@@ -114,7 +122,21 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                 </IconButton>
               </Tooltip>
               <Tooltip title={"Save changes"}>
-                <IconButton color={"primary"} onClick={() => updateSnippet({id: id, updateSnippet: {content: code}})} disabled={isUpdateSnippetLoading || snippet?.content === code} >
+                <IconButton color={"primary"}
+                            onClick={() => updateSnippet(
+                                {
+                                  input:
+                                      {snippet: code,
+                                        snippetId: id,
+                                        name: snippet?.name ?? "",
+                                        description: snippet?.description ?? "",
+                                        language: snippet?.language ?? "",
+                                        version: snippet?.version ?? ""
+                                      }
+                                        , id
+                                }
+                            )}
+                            disabled={isUpdateSnippetLoading || snippet?.snippet === code} >
                   <Save />
                 </IconButton>
               </Tooltip>
@@ -146,8 +168,8 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
             </Box>
           </>
         }
-        <ShareSnippetModal loading={loadingShare || isLoading} open={shareModalOppened}
-                           onClose={() => setShareModalOppened(false)}
+        <ShareSnippetModal loading={loadingShare || isLoading} open={shareModalOpened}
+                           onClose={() => setShareModalOpened(false)}
                            onShare={handleShareSnippet}/>
         <TestSnippetModal open={testModalOpened} onClose={() => setTestModalOpened(false)}/>
         <DeleteConfirmationModal open={deleteConfirmationModalOpen} onClose={() => setDeleteConfirmationModalOpen(false)} id={snippet?.id ?? ""} setCloseDetails={handleCloseModal} />

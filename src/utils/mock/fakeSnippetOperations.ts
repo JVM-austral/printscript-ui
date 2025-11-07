@@ -1,12 +1,13 @@
 import {SnippetOperations} from '../snippetOperations'
 import {FakeSnippetStore} from './fakeSnippetStore'
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
+import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../../types/snippetType.ts'
 import autoBind from 'auto-bind'
 import {PaginatedUsers} from "../users.ts";
 import {TestCase} from "../../types/TestCase.ts";
 import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
+import {CreateSnippetResponse} from "../../api/responses/snippets.response.ts";
 
 const DELAY: number = 1000
 
@@ -17,13 +18,13 @@ export class FakeSnippetOperations implements SnippetOperations {
     autoBind(this)
   }
 
-  createSnippet(createSnippet: CreateSnippet): Promise<Snippet> {
+  createSnippet(createSnippet: CreateSnippet): Promise<CreateSnippetResponse> {
     return new Promise(resolve => {
       setTimeout(() => resolve(this.fakeStore.createSnippet(createSnippet)), DELAY)
     })
   }
 
-  getSnippetById(id: string): Promise<Snippet | undefined> {
+  getSnippetById(id: string): Promise<SnippetType | undefined> {
     return new Promise(resolve => {
       setTimeout(() => resolve(this.fakeStore.getSnippetById(id)), DELAY)
     })
@@ -33,7 +34,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     const response: PaginatedSnippets = {
       page: page,
       page_size: pageSize,
-      count: 20,
+      total: 20,
       snippets: page == 0 ? this.fakeStore.listSnippetDescriptors().splice(0,pageSize) : this.fakeStore.listSnippetDescriptors().splice(1,2)
     }
 
@@ -42,7 +43,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
+  updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<SnippetType> {
     return new Promise(resolve => {
       setTimeout(() => resolve(this.fakeStore.updateSnippet(id, updateSnippet)), DELAY)
     })
@@ -54,7 +55,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  shareSnippet(snippetId: string): Promise<Snippet> {
+  shareSnippet(snippetId: string): Promise<SnippetType> {
     return new Promise(resolve => {
       // @ts-expect-error, it will always find it in the fake store
       setTimeout(() => resolve(this.fakeStore.getSnippetById(snippetId)), DELAY)
