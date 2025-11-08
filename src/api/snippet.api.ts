@@ -15,7 +15,6 @@ export async function getAllSnippets(pagination: PaginationParams): Promise<Pagi
     const { data } = await apiClient.get("/snippet-manager/snippets", {
         params:pagination
     });
-    console.log(data)
     return data;
 }
 
@@ -29,7 +28,7 @@ export async function createSnippet(createSnippet: CreateSnippet ): Promise<Crea
     return data;
 }
 export async function updateSnippet(updateSnippet :UpdateSnippet): Promise<CreateSnippetResponse> {
-    const { data } = await apiClient.put("/snippet-manager/snippets", updateSnippet);
+    const { data } = await apiClient.patch("/snippet-manager/snippets", updateSnippet);
     return data;
 }
 
@@ -40,5 +39,10 @@ export async function shareSnippet(shareSnippet :ShareSnippet) {
 
 export async function runSnippet(runSnippet :RunSnippet):Promise<RunSnippetResponse> {
     const { data } = await apiClient.post("/snippet-manager/snippets/run", runSnippet);
+    return data;
+}
+
+export async function deleteSnippetById(id: string): Promise<string> {
+    const { data } = await apiClient.delete(`/snippet-manager/snippets/${id}`);
     return data;
 }

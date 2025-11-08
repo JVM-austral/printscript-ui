@@ -44,7 +44,7 @@ export const SnippetTable = (props: SnippetTableProps) => {
   const handleLoadSnippet = async (target: EventTarget & HTMLInputElement) => {
     const files = target.files
     if (!files || !files.length) {
-      createSnackbar('error',"Please select at leat one file")
+      createSnackbar('error',"Please select at least one file")
       return
     }
     const file = files[0]
@@ -56,10 +56,11 @@ export const SnippetTable = (props: SnippetTableProps) => {
     }
     file.text().then((text) => {
       setSnippet({
+        description: "",
+        version: "",
         name: splitName[0],
-        content: text,
+        snippet: text,
         language: fileType.language,
-        extension: fileType.extension
       })
     }).catch(e => {
       console.error(e)
@@ -98,7 +99,7 @@ export const SnippetTable = (props: SnippetTableProps) => {
             <TableRow sx={{fontWeight: 'bold'}}>
               <StyledTableCell sx={{fontWeight: "bold"}}>Name</StyledTableCell>
               <StyledTableCell sx={{fontWeight: "bold"}}>Language</StyledTableCell>
-              <StyledTableCell sx={{fontWeight: "bold"}}>Author</StyledTableCell>
+              <StyledTableCell sx={{fontWeight: "bold"}}>Version</StyledTableCell>
               <StyledTableCell sx={{fontWeight: "bold"}}>Conformance</StyledTableCell>
             </TableRow>
           </TableHead>

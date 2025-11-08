@@ -2,11 +2,19 @@ import { SnippetOperations } from "./snippetOperations.ts";
 import { CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet } from "../types/snippetType.ts";
 import { FileType } from "../types/FileType.ts";
 import { Rule } from "../types/Rule.ts";
-import { TestCase } from "../types/TestCase.ts";
+import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import { PaginatedUsers, User } from "./users.ts";
 import { TestCaseResult } from "./queries.tsx";
-import { createSnippet, updateSnippet, shareSnippet, getSnippetById, getAllSnippets } from "../api/snippet.api.ts";
+import {
+  createSnippet,
+  updateSnippet,
+  shareSnippet,
+  getSnippetById,
+  getAllSnippets,
+  deleteSnippetById
+} from "../api/snippet.api.ts";
 import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
+import {createSnippetTest, deleteSnippetTest, getAllSnippetsTests, runSnippetTest} from "../api/tests.api.ts";
 
 export class SnippetManagerOperations implements SnippetOperations {
   // Snippets
@@ -19,7 +27,7 @@ export class SnippetManagerOperations implements SnippetOperations {
   }
 
   deleteSnippet(id: string): Promise<string> {
-    return Promise.resolve(id);
+    return deleteSnippetById(id)
   }
 
   getSnippetById(id: string): Promise<SnippetType | undefined> {
@@ -34,50 +42,48 @@ export class SnippetManagerOperations implements SnippetOperations {
   formatSnippet(snippet: string): Promise<string> {
     return Promise.resolve(`//Mocked format of snippet :) \n${snippet}`);
   }
-
+  //TODO
   getFormatRules(): Promise<Rule[]> {
     return Promise.resolve([]);
   }
-
+  //TODO
   getLintingRules(): Promise<Rule[]> {
     return Promise.resolve([]);
   }
-
+  //TODO
   getFileTypes(): Promise<FileType[]> {
     return Promise.resolve([]);
   }
-
+  //TODO
   modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
     return Promise.resolve(newRules);
   }
-
+  //TODO
   modifyLintingRule(newRules: Rule[]): Promise<Rule[]> {
     return Promise.resolve(newRules);
   }
 
   // Tests
-  getTestCases(): Promise<TestCase[]> {
-    return Promise.resolve([]);
+  getTestCases(snippetId: string): Promise<TestCase[]> {
+    return getAllSnippetsTests(snippetId)
   }
 
-  postTestCase(testCase: Partial<TestCase>): Promise<TestCase> {
-    // @ts-ignore
-      const id = (testCase as unknown)?. id ?? String(Date.now());
-    const newTestCase = { ...testCase, id } as TestCase;
-    return Promise.resolve(newTestCase);
+  createTestCase(testCase: CreateSnippetTestCase): Promise<TestCase> {
+    return createSnippetTest(testCase)
   }
 
   removeTestCase(id: string): Promise<string> {
-    return Promise.resolve(id);
+    return deleteSnippetTest(id)
   }
 
-  testSnippet(testCase: Partial<TestCase>): Promise<TestCaseResult> {
-    void testCase;
-    const result: TestCaseResult = Math.random() > 0.5 ? "success" : "fail";
+  async runTestCase(id: string): Promise<TestCaseResult> {
+    const response = await runSnippetTest(id)
+    const result: TestCaseResult = response === "Test passed successfully" ? "success" : "fail";
     return Promise.resolve(result);
   }
 
   // Users
+  //TODO
   getUserFriends(name?: string, page?: number, pageSize?: number): Promise<PaginatedUsers> {
     const friend: User = {
       id: "1",
