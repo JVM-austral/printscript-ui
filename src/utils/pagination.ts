@@ -1,7 +1,7 @@
 export type Pagination = {
   page: number,
   page_size: number,
-  total: number
+  count: number
 }
 
 export type PaginationParams = {

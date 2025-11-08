@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {TestCase} from "../../types/TestCase.ts";
+import {CreateSnippetTestCase, TestCase} from "../../types/TestCase.ts";
 import {Autocomplete, Box, Button, Chip, TextField, Typography} from "@mui/material";
 import {BugReport, Delete, Save} from "@mui/icons-material";
 import {useTestSnippet} from "../../utils/queries.tsx";
@@ -8,7 +8,7 @@ type TabPanelProps = {
     index: number;
     value: number;
     test?: TestCase;
-    setTestCase: (test: Partial<TestCase>) => void;
+    setTestCase: (test: Partial<CreateSnippetTestCase>) => void;
     removeTestCase?: (testIndex: string) => void;
 }
 
@@ -88,7 +88,7 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                         <Button disabled={!testData?.name} onClick={() => setTestCase(testData ?? {})} variant={"outlined"} startIcon={<Save/>}>
                             Save
                         </Button>
-                        <Button onClick={() => testSnippet(testData ?? {})} variant={"contained"} startIcon={<BugReport/>}
+                        <Button onClick={() => testSnippet(testData?.id || "")} variant={"contained"} startIcon={<BugReport/>}
                                 disableElevation>
                             Test
                         </Button>

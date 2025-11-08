@@ -1,6 +1,6 @@
 import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../types/snippetType.ts'
 import {PaginatedUsers} from "./users.ts";
-import {TestCase} from "../types/TestCase.ts";
+import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import {TestCaseResult} from "./queries.tsx";
 import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
@@ -23,17 +23,17 @@ export interface SnippetOperations {
 
   getLintingRules(): Promise<Rule[]>
 
-  getTestCases(): Promise<TestCase[]>
+  getTestCases(snippetId: string): Promise<TestCase[]>
 
   formatSnippet(snippet: string): Promise<string>
 
-  postTestCase(testCase: Partial<TestCase>): Promise<TestCase>
+  createTestCase(testCase: Partial<CreateSnippetTestCase>): Promise<TestCase>
 
   removeTestCase(id: string): Promise<string>
 
   deleteSnippet(id: string): Promise<string>
 
-  testSnippet(testCase: Partial<TestCase>): Promise<TestCaseResult>
+  runTestCase(id: string): Promise<TestCaseResult>
 
   getFileTypes(): Promise<FileType[]>
 

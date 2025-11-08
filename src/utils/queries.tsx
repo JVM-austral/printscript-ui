@@ -2,7 +2,7 @@ import {useMutation, UseMutationResult, useQuery} from 'react-query';
 import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../types/snippetType.ts';
 import {SnippetOperations} from "./snippetOperations.ts";
 import {PaginatedUsers} from "./users.ts";
-import {TestCase} from "../types/TestCase.ts";
+import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
 import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
@@ -75,18 +75,18 @@ export const useShareSnippet = () => {
 };
 
 
-export const useGetTestCases = () => {
+export const useGetTestCases = (snippetId: string) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<TestCase[] | undefined, Error>(['testCases'], () => snippetOperations.getTestCases(), {});
+  return useQuery<TestCase[] | undefined, Error>(['testCases'], () => snippetOperations.getTestCases(snippetId), {});
 };
 
 
 export const usePostTestCase = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<TestCase, Error, Partial<TestCase>>(
-      (tc) => snippetOperations.postTestCase(tc)
+  return useMutation<TestCase, Error, Partial<CreateSnippetTestCase>>(
+      (tc) => snippetOperations.createTestCase(tc)
   );
 };
 
@@ -108,8 +108,8 @@ export type TestCaseResult = "success" | "fail"
 export const useTestSnippet = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<TestCaseResult, Error, Partial<TestCase>>(
-      (tc) => snippetOperations.testSnippet(tc)
+  return useMutation<TestCaseResult, Error, string>(
+      (tc) => snippetOperations.runTestCase(tc)
   )
 }
 

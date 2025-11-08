@@ -86,7 +86,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  postTestCase(testCase: TestCase): Promise<TestCase> {
+  createTestCase(testCase: TestCase): Promise<TestCase> {
     return new Promise(resolve => {
       setTimeout(() => resolve(this.fakeStore.postTestCase(testCase)), DELAY)
     })
@@ -98,7 +98,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  testSnippet(): Promise<TestCaseResult> {
+  runTestCase(): Promise<TestCaseResult> {
     return new Promise(resolve => {
       setTimeout(() => resolve(this.fakeStore.testSnippet()), DELAY)
     })

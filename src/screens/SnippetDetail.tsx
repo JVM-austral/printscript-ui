@@ -63,7 +63,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
 
   useEffect(() => {
     if (snippet) {
-      setCode(snippet.snippet);
+      setCode(snippet.bucketId);
     }
   }, [snippet]);
 
@@ -164,14 +164,14 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
             </Box>
             <Box pt={1} flex={1} marginTop={2}>
               <Alert severity="info">Output</Alert>
-              <SnippetExecution />
+              <SnippetExecution id={id}/>
             </Box>
           </>
         }
         <ShareSnippetModal loading={loadingShare || isLoading} open={shareModalOpened}
                            onClose={() => setShareModalOpened(false)}
                            onShare={handleShareSnippet}/>
-        <TestSnippetModal open={testModalOpened} onClose={() => setTestModalOpened(false)}/>
+        <TestSnippetModal open={testModalOpened} onClose={() => setTestModalOpened(false)} snippetId={id}/>
         <DeleteConfirmationModal open={deleteConfirmationModalOpen} onClose={() => setDeleteConfirmationModalOpen(false)} id={snippet?.id ?? ""} setCloseDetails={handleCloseModal} />
       </Box>
   );
