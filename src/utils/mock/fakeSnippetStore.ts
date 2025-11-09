@@ -40,7 +40,7 @@ const INITIAL_SNIPPETS: SnippetType[] = [
 ]
 
 const paginatedUsers: PaginatedUsers = {
-  total: 5,
+  count: 5,
   page: 1,
   page_size: 10,
   users: [
@@ -126,38 +126,28 @@ const INITIAL_LINTING_RULES: Rule[] = [
   },
 ]
 
-const fakeTestCases: TestCase[] = [
-  {
-    id: uuid(),
-    name: "Test Case 1",
-    input: ["A", "B"],
-    output: ["C", "D"]
-  },
-  {
-    id: uuid(),
-    name: "Test Case 2",
-    input: ["E", "F"],
-    output: ["G", "H"]
-  },
-]
-
 const fileTypes: FileType[] = [
   {
     language: "printscript",
     extension: "prs",
   },
   {
-    language: "python",
+    language: "python -not supported-",
     extension: "py",
   },
   {
-    language: "java",
+    language: "java -not supported-",
     extension: "java",
   },
   {
-    language: 'golang',
+    language: 'golang -not supported-',
     extension: 'go'
   }
+]
+
+const versions : string[]=[
+    "V1",
+    "V2",
 ]
 
 export class FakeSnippetStore {
@@ -169,10 +159,6 @@ export class FakeSnippetStore {
   constructor() {
     INITIAL_SNIPPETS.forEach(snippet => {
       this.snippetMap.set(snippet.id, snippet)
-    })
-
-    fakeTestCases.forEach(testCase => {
-      this.testCaseMap.set(testCase.id, testCase)
     })
     this.formattingRules = INITIAL_FORMATTING_RULES
     this.lintingRules = INITIAL_LINTING_RULES
@@ -264,6 +250,10 @@ export class FakeSnippetStore {
     return fileTypes
   }
 
+  getVersions(): string[] {
+    return versions
+  }
+
   modifyFormattingRule(newRules: Rule[]): Rule[] {
     this.formattingRules = newRules;
     return newRules;
@@ -273,4 +263,6 @@ export class FakeSnippetStore {
     this.lintingRules = newRules
     return newRules
   }
+
+
 }

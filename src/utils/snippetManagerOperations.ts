@@ -16,8 +16,12 @@ import {
 import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
 import {createSnippetTest, deleteSnippetTest, getAllSnippetsTests, runSnippetTest} from "../api/tests.api.ts";
 import {formatUniqueSnippet} from "../api/rules.api.ts";
+import {FakeSnippetStore} from "./mock/fakeSnippetStore.ts";
+
 
 export class SnippetManagerOperations implements SnippetOperations {
+  private readonly fakeStore = new FakeSnippetStore()
+
   // Snippets
   createSnippet(input: CreateSnippet): Promise<CreateSnippetResponse> {
     return createSnippet(input);
@@ -51,10 +55,16 @@ export class SnippetManagerOperations implements SnippetOperations {
   getLintingRules(): Promise<Rule[]> {
     return Promise.resolve([]);
   }
-  //TODO
+  //TODO-Mocked
   getFileTypes(): Promise<FileType[]> {
-    return Promise.resolve([]);
+    return new Promise(resolve => {resolve(this.fakeStore.getFileTypes())
+    })
   }
+
+  getVersion() : Promise<string[]> {
+    return new Promise(resolve => {resolve(this.fakeStore.getVersions())})
+  }
+
   //TODO
   modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
     return Promise.resolve(newRules);

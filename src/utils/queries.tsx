@@ -172,3 +172,9 @@ export const useGetFileTypes = () => {
 
   return useQuery<FileType[], Error>('fileTypes', () => snippetOperations.getFileTypes());
 }
+
+export const useGetVersions = () => {
+  const snippetOperations = useSnippetsOperations()
+
+  return useQuery<string[], Error>('versions', () => snippetOperations.getVersion());
+}

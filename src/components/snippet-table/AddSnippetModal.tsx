@@ -20,7 +20,7 @@ import "prismjs/themes/prism-okaidia.css";
 import {Save} from "@mui/icons-material";
 import {CreateSnippet, CreateSnippetWithLang} from "../../types/snippetType.ts";
 import {ModalWrapper} from "../common/ModalWrapper.tsx";
-import {useCreateSnippet, useGetFileTypes} from "../../utils/queries.tsx";
+import {useCreateSnippet, useGetFileTypes, useGetVersions} from "../../utils/queries.tsx";
 import {queryClient} from "../../App.tsx";
 
 export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
@@ -31,18 +31,21 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     const [language, setLanguage] = useState(defaultSnippet?.language ?? "printscript");
     const [code, setCode] = useState(defaultSnippet?.snippet ?? "");
     const [snippetName, setSnippetName] = useState(defaultSnippet?.name ?? "")
+    const [version, setVersion] = useState(defaultSnippet?.version ?? "");
+    const [description, setDescription] = useState(defaultSnippet?.description ?? "");
     const {mutateAsync: createSnippet, isLoading: loadingSnippet} = useCreateSnippet({
         onSuccess: () => queryClient.invalidateQueries('listSnippets')
     })
     const {data: fileTypes} = useGetFileTypes();
+    const {data: versions} = useGetVersions();
 
     const handleCreateSnippet = async () => {
         const newSnippet: CreateSnippet = {
             name: snippetName,
             snippet: code,
             language: language,
-            description: '',
-            version: fileTypes?.find((f) => f.language === language)?.extension ?? "prs"
+            description: description,
+            version: version
         }
         await createSnippet(newSnippet);
         onClose();
@@ -53,6 +56,8 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
             setCode(defaultSnippet?.snippet)
             setLanguage(defaultSnippet?.language)
             setSnippetName(defaultSnippet?.name)
+            setVersion(defaultSnippet?.version)
+            setDescription(defaultSnippet?.description)
         }
     }, [defaultSnippet]);
 
@@ -74,37 +79,75 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                     </Button>
                 </Box>
             }
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-            }}>
-                <InputLabel htmlFor="name">Name</InputLabel>
-                <Input onChange={e => setSnippetName(e.target.value)} value={snippetName} id="name"
-                       sx={{width: '50%'}}/>
-            </Box>
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-            }}>
-                <InputLabel htmlFor="name">Language</InputLabel>
-                <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={language}
-                    label="Age"
-                    onChange={(e: SelectChangeEvent<string>) => setLanguage(e.target.value)}
-                    sx={{width: '50%'}}
-                >
-                    {
-                        fileTypes?.map(x => (
-                            <MenuItem data-testid={`menu-option-${x.language}`} key={x.language}
-                                      value={x.language}>{capitalize((x.language))}</MenuItem>
-                        ))
-                    }
-                </Select>
-            </Box>
+            <div style={{ display: 'flex', flexDirection: 'row', minWidth: '300px', gap: '24px', marginBottom: '16px' }}>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                }}>
+                    <InputLabel htmlFor="name">Name</InputLabel>
+                    <Input onChange={e => setSnippetName(e.target.value)} value={snippetName} id="name"
+                           sx={{width: '80%'}}/>
+                </Box>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                }}>
+                    <InputLabel htmlFor="name">Description</InputLabel>
+                    <Input onChange={e => setDescription(e.target.value)} value={description} id="description"
+                           sx={{width: '100%'}}/>
+                </Box>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'row', minWidth: '300px', gap: '24px', marginBottom: '16px' }}>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    width: '15%'
+                }}>
+                    <InputLabel htmlFor="name">Version</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={version}
+                        label="Age"
+                        onChange={(e: SelectChangeEvent<string>) => setVersion(e.target.value)}
+                        sx={{width: '100%'}}
+                    >
+                        {
+                            versions?.map(x => (
+                                <MenuItem data-testid={`menu-option-${x}`} key={x}
+                                          value={x}>{capitalize((x))}</MenuItem>
+                            ))
+                        }
+                    </Select>
+                </Box>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    width: '60%'
+                }}>
+                    <InputLabel htmlFor="name">Language</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={language}
+                        label="Age"
+                        onChange={(e: SelectChangeEvent<string>) => setLanguage(e.target.value)}
+                        sx={{width: '50%'}}
+                    >
+                        {
+                            fileTypes?.map(x => (
+                                <MenuItem data-testid={`menu-option-${x.language}`} key={x.language}
+                                          value={x.language}>{capitalize((x.language))}</MenuItem>
+                            ))
+                        }
+                    </Select>
+                </Box>
+            </div>
             <InputLabel>Code Snippet</InputLabel>
             <Box width={"100%"} sx={{
                 backgroundColor: 'black', color: 'white', borderRadius: "8px",
