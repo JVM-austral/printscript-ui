@@ -37,6 +37,8 @@ export interface SnippetOperations {
 
   getFileTypes(): Promise<FileType[]>
 
+  getVersion() : Promise<string[]>
+
   modifyFormatRule(newRules: Rule[]): Promise<Rule[]>
 
   modifyLintingRule(newRules: Rule[]): Promise<Rule[]>
