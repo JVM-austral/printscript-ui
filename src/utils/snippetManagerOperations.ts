@@ -15,6 +15,7 @@ import {
 } from "../api/snippet.api.ts";
 import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
 import {createSnippetTest, deleteSnippetTest, getAllSnippetsTests, runSnippetTest} from "../api/tests.api.ts";
+import {formatUniqueSnippet} from "../api/rules.api.ts";
 
 export class SnippetManagerOperations implements SnippetOperations {
   // Snippets
@@ -39,8 +40,8 @@ export class SnippetManagerOperations implements SnippetOperations {
   }
 
   // Format and Linting
-  formatSnippet(snippet: string): Promise<string> {
-    return Promise.resolve(`//Mocked format of snippet :) \n${snippet}`);
+  formatSnippet(content: string, snippetId: string): Promise<string> {
+    return formatUniqueSnippet(content, snippetId);
   }
   //TODO
   getFormatRules(): Promise<Rule[]> {
@@ -93,7 +94,7 @@ export class SnippetManagerOperations implements SnippetOperations {
       users: [friend],
       page: page || 0,
       page_size: pageSize || 10,
-      total: 1,
+      count: 1,
     };
     return Promise.resolve(user);
   }

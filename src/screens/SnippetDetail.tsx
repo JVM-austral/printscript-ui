@@ -115,9 +115,8 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                   {isRunning ? <StopRounded/> : <PlayArrow/>}
                 </IconButton>
               </Tooltip>
-              {/* TODO: we can implement a live mode*/}
               <Tooltip title={"Format"}>
-                <IconButton onClick={() => formatSnippet(code)} disabled={isFormatLoading}>
+                <IconButton onClick={() => formatSnippet({snippetId:id, snippetContent: code})} disabled={isFormatLoading}>
                   <ReadMoreIcon />
                 </IconButton>
               </Tooltip>
