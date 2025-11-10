@@ -1,7 +1,7 @@
 
 export type Rule = {
-    id: string,
-    name: string,
-    isActive: boolean,
-    value?: string | number | null,
+    name: string;
+    value: boolean | string | number | null;
 }
+
+

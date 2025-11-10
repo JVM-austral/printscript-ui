@@ -15,8 +15,9 @@ import {
 } from "../api/snippet.api.ts";
 import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
 import {createSnippetTest, deleteSnippetTest, getAllSnippetsTests, runSnippetTest} from "../api/tests.api.ts";
-import {formatUniqueSnippet} from "../api/rules.api.ts";
+import {formatUniqueSnippet, getFormatRules, getLintingRules} from "../api/rules.api.ts";
 import {FakeSnippetStore} from "./mock/fakeSnippetStore.ts";
+import {LintingRulesRecord} from "../api/responses/rules.responses.ts";
 
 
 export class SnippetManagerOperations implements SnippetOperations {
@@ -48,13 +49,17 @@ export class SnippetManagerOperations implements SnippetOperations {
     return formatUniqueSnippet(content, snippetId);
   }
   //TODO
-  getFormatRules(): Promise<Rule[]> {
-    return Promise.resolve([]);
+  async getFormatRules(): Promise<Rule[]> {
+    return await getFormatRules().then((resp: LintingRulesRecord) =>
+        Object.entries(resp).map(([name, value]) => ({name, value})));
+
   }
-  //TODO
-  getLintingRules(): Promise<Rule[]> {
-    return Promise.resolve([]);
+
+  async getLintingRules(): Promise<Rule[]> {
+    return await getLintingRules().then((resp: LintingRulesRecord) =>
+        Object.entries(resp).map(([name, value]) => ({name, value})));
   }
+
   //TODO-Mocked
   getFileTypes(): Promise<FileType[]> {
     return new Promise(resolve => {resolve(this.fakeStore.getFileTypes())

@@ -36,12 +36,11 @@ const StyledTableRow = styled(TableRow)(({theme}) => ({
 
 
 export const SnippetRow = ({snippet, onClick, ...props}: { snippet: SnippetType, onClick: () => void } & TableRowProps) => {
-    const version = snippet.version === "V2" ? "version 2" : "version 1";
   return (
       <StyledTableRow onClick={onClick} sx={{backgroundColor: 'white', border: 0, height: '75px'}} {...props}>
         <StyledTableCell>{snippet.name}</StyledTableCell>
         <StyledTableCell>{snippet.language}</StyledTableCell>
-        <StyledTableCell>{version}</StyledTableCell>
+        <StyledTableCell>{snippet.author}</StyledTableCell>
         <StyledTableCell>{snippet.compliance}</StyledTableCell>
       </StyledTableRow>
   )

@@ -14,7 +14,7 @@ const HomeScreen = () => {
   const [snippetName, setSnippetName] = useState('');
   const [snippetId, setSnippetId] = useState<string | null>(null)
   const {page, page_size, count, handleChangeCount} = usePaginationContext()
-  const {data, isLoading} = useGetSnippets(page, page_size, snippetName)
+  const {data, isLoading, isError} = useGetSnippets(page, page_size, snippetName)
 
   useEffect(() => {
     if (data?.count && data.count != count) {
@@ -44,13 +44,17 @@ const HomeScreen = () => {
   };
 
   return (
-      <>
-        <SnippetTable loading={isLoading} handleClickSnippet={setSnippetId} snippets={data?.snippets}
-                      handleSearchSnippet={handleSearchSnippet}/>
-        <Drawer open={!!snippetId} anchor={"right"} onClose={handleCloseModal}>
-          {snippetId && <SnippetDetail handleCloseModal={handleCloseModal} id={snippetId}/>}
-        </Drawer>
-      </>
+      <div>
+      {!isError &&
+          <>
+              <SnippetTable loading={isLoading} handleClickSnippet={setSnippetId} snippets={data?.snippets}
+                          handleSearchSnippet={handleSearchSnippet}/><Drawer open={!!snippetId} anchor={"right"}
+                                                                             onClose={handleCloseModal}>
+              {snippetId && <SnippetDetail handleCloseModal={handleCloseModal} id={snippetId}/>}
+          </Drawer>
+          </>}
+          {isError && <div>Error loading snippets.</div>}
+      </div>
   )
 }
 
