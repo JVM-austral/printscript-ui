@@ -3,24 +3,23 @@ import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../t
 import {SnippetOperations} from "./snippetOperations.ts";
 import {PaginatedUsers} from "./users.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
-import {FileType} from "../types/FileType.ts";
-import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
+import {CreateSnippetResponse, LanguagesResponse} from "../api/responses/snippets.response.ts";
 import {SnippetManagerOperations} from "./snippetManagerOperations.ts";
 import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
-// import {useAuth0} from "@auth0/auth0-react";
-// import {useEffect} from "react";
+import {useAuth0} from "@auth0/auth0-react";
+import {useEffect} from "react";
 
 
 export const useSnippetsOperations = () => {
-  // const {getAccessTokenSilently} = useAuth0()
-  //
-  // useEffect(() => {
-  //     getAccessTokenSilently()
-  //         .then(token => {
-  //             console.log(token)
-  //         })
-  //         .catch(error => console.error(error));
-  // });
+  const {getAccessTokenSilently} = useAuth0()
+
+  useEffect(() => {
+      getAccessTokenSilently()
+          .then(token => {
+              console.log(token)
+          })
+          .catch(error => console.error(error));
+  });
 
   const snippetOperations: SnippetOperations = new SnippetManagerOperations()
 
@@ -173,11 +172,5 @@ export const useDeleteSnippet = ({onSuccess}: {onSuccess: () => void}) => {
 export const useGetFileTypes = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<FileType[], Error>('fileTypes', () => snippetOperations.getFileTypes());
-}
-
-export const useGetVersions = () => {
-  const snippetOperations = useSnippetsOperations()
-
-  return useQuery<string[], Error>('versions', () => snippetOperations.getVersion());
+  return useQuery<LanguagesResponse[], Error>('fileTypes', () => snippetOperations.getFileTypes());
 }

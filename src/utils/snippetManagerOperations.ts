@@ -1,6 +1,5 @@
 import { SnippetOperations } from "./snippetOperations.ts";
 import { CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet } from "../types/snippetType.ts";
-import { FileType } from "../types/FileType.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import { PaginatedUsers, User } from "./users.ts";
 import { TestCaseResult } from "./queries.tsx";
@@ -10,9 +9,9 @@ import {
   shareSnippet,
   getSnippetById,
   getAllSnippets,
-  deleteSnippetById
+  deleteSnippetById, getLanguages
 } from "../api/snippet.api.ts";
-import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
+import {CreateSnippetResponse, LanguagesResponse} from "../api/responses/snippets.response.ts";
 import {
   createSnippetTest,
   deleteSnippetTest,
@@ -27,13 +26,11 @@ import {
   saveFormatRules,
   saveLintingRules
 } from "../api/rules.api.ts";
-import {FakeSnippetStore} from "./mock/fakeSnippetStore.ts";
 import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
 import {AxiosError} from "axios";
 
 
 export class SnippetManagerOperations implements SnippetOperations {
-  private readonly fakeStore = new FakeSnippetStore()
 
   // Snippets
   createSnippet(input: CreateSnippet): Promise<CreateSnippetResponse> {
@@ -69,16 +66,9 @@ export class SnippetManagerOperations implements SnippetOperations {
     return getLintingRules()
   }
 
-  //TODO-Mocked
-  getFileTypes(): Promise<FileType[]> {
-    return new Promise(resolve => {resolve(this.fakeStore.getFileTypes())
-    })
+  getFileTypes(): Promise<LanguagesResponse[]> {
+    return getLanguages()
   }
-
-  getVersion() : Promise<string[]> {
-    return new Promise(resolve => {resolve(this.fakeStore.getVersions())})
-  }
-
 
   async modifyFormatRule(newRules: FormatRulesRecord): Promise<void> {
     try {

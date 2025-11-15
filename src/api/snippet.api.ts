@@ -8,7 +8,7 @@ import {
     SnippetType,
     UpdateSnippet
 } from "../types/snippetType.ts";
-import {CreateSnippetResponse, RunSnippetResponse} from "./responses/snippets.response.ts";
+import {CreateSnippetResponse, LanguagesResponse, RunSnippetResponse} from "./responses/snippets.response.ts";
 
 
 export async function getAllSnippets(pagination: PaginationParams): Promise<PaginatedSnippets> {
@@ -44,5 +44,10 @@ export async function runSnippet(runSnippet :RunSnippet):Promise<RunSnippetRespo
 
 export async function deleteSnippetById(id: string): Promise<string> {
     const { data } = await apiClient.delete(`/snippet-manager/snippets/${id}`);
+    return data;
+}
+
+export async function getLanguages(): Promise<LanguagesResponse[]> {
+    const { data } = await apiClient.get("/snippet-manager/snippets/languages");
     return data;
 }

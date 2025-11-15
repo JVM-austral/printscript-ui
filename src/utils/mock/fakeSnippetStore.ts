@@ -34,8 +34,6 @@ const INITIAL_SNIPPETS: SnippetType[] = [
   }
 ]
 
-
-
 const fileTypes: FileType[] = [
   {
     language: "printscript",

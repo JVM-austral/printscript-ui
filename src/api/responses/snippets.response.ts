@@ -8,3 +8,9 @@ export type RunSnippetResponse = {
     errors: string[];
 }
 
+export type LanguagesResponse = {
+    displayName: string;
+    versions: string[];
+    extension: string;
+}
+

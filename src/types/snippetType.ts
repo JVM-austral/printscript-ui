@@ -1,5 +1,4 @@
 import {Pagination} from "../utils/pagination.ts";
-import {FileType} from "./FileType.ts";
 
 export type ComplianceEnum =
     'pending' |
@@ -32,9 +31,6 @@ export type PaginatedSnippets = Pagination & {
   snippets: SnippetType[]
 }
 
-export const getFileLanguage = (fileTypes: FileType[], fileExt?: string) => {
-  return fileExt && fileTypes?.find(x => x.extension == fileExt)
-}
 
 export type ShareSnippet = {
     snippetId: string;

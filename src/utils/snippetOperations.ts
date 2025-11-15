@@ -2,8 +2,7 @@ import {CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet} from '../t
 import {PaginatedUsers} from "./users.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import {TestCaseResult} from "./queries.tsx";
-import {FileType} from "../types/FileType.ts";
-import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
+import {CreateSnippetResponse, LanguagesResponse} from "../api/responses/snippets.response.ts";
 import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
 
 export interface SnippetOperations {
@@ -35,9 +34,7 @@ export interface SnippetOperations {
 
   runTestCase(id: string): Promise<TestCaseResult>
 
-  getFileTypes(): Promise<FileType[]>
-
-  getVersion() : Promise<string[]>
+  getFileTypes(): Promise<LanguagesResponse[]>
 
   modifyFormatRule(newRules: FormatRulesRecord): Promise<void>
 

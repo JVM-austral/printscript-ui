@@ -20,7 +20,7 @@ import "prismjs/themes/prism-okaidia.css";
 import {Save} from "@mui/icons-material";
 import {CreateSnippet, CreateSnippetWithLang} from "../../types/snippetType.ts";
 import {ModalWrapper} from "../common/ModalWrapper.tsx";
-import {useCreateSnippet, useGetFileTypes, useGetVersions} from "../../utils/queries.tsx";
+import {useCreateSnippet, useGetFileTypes} from "../../utils/queries.tsx";
 import {queryClient} from "../../App.tsx";
 
 export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
@@ -37,7 +37,6 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
         onSuccess: () => queryClient.invalidateQueries('listSnippets')
     })
     const {data: fileTypes} = useGetFileTypes();
-    const {data: versions} = useGetVersions();
     const [saveError, setSaveError] = useState(false);
     const [saveErrorsList, setSaveErrorsList] = useState<string[]>([]);
 
@@ -50,7 +49,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
             version: version
         }
         const saveResponse = await createSnippet(newSnippet);
-        if(saveResponse.errorMessage){
+        if(saveResponse.errorMessage.length > 0){
             setSaveError(true);
             setSaveErrorsList(saveResponse.errorMessage)
             return;
@@ -112,29 +111,6 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '16px',
-                    width: '15%'
-                }}>
-                    <InputLabel htmlFor="name">Version</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={version}
-                        label="Age"
-                        onChange={(e: SelectChangeEvent<string>) => setVersion(e.target.value)}
-                        sx={{width: '100%'}}
-                    >
-                        {
-                            versions?.map(x => (
-                                <MenuItem data-testid={`menu-option-${x}`} key={x}
-                                          value={x}>{capitalize((x))}</MenuItem>
-                            ))
-                        }
-                    </Select>
-                </Box>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
                     width: '60%'
                 }}>
                     <InputLabel htmlFor="name">Language</InputLabel>
@@ -142,18 +118,45 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         value={language}
-                        label="Age"
-                        onChange={(e: SelectChangeEvent<string>) => setLanguage(e.target.value)}
+                        label="Language"
+                        onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)}
                         sx={{width: '50%'}}
                     >
-                        {
-                            fileTypes?.map(x => (
-                                <MenuItem data-testid={`menu-option-${x.language}`} key={x.language}
-                                          value={x.language}>{capitalize((x.language))}</MenuItem>
-                            ))
-                        }
+                        {fileTypes?.map(x => (
+                            <MenuItem data-testid={`menu-option-${x.displayName}`} key={x.displayName} value={x.displayName}>
+                                {capitalize(x.displayName)}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </Box>
+                {language && (fileTypes?.find(ft => ft.displayName === language)?.versions?.length ?? 0) > 0 && (
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        width: '15%'
+                    }}>
+                        <InputLabel htmlFor="name">Version</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={version}
+                            label="Version"
+                            onChange={(e: SelectChangeEvent) => setVersion(e.target.value)}
+                            sx={{width: '100%'}}
+                        >
+                            {fileTypes
+                                ?.find(ft => ft.displayName === language)
+                                ?.versions
+                                ?.map((v: string) => (
+                                    <MenuItem data-testid={`menu-option-${v}`} key={v} value={v}>
+                                        {capitalize(v)}
+                                    </MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </Box>
+                )}
             </div>
             <InputLabel>Code Snippet</InputLabel>
             {saveError &&
