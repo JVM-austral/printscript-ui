@@ -5,6 +5,7 @@ import "prismjs/themes/prism-okaidia.css";
 import {Alert, Box, CircularProgress, IconButton, Tooltip, Typography} from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import {
+  useGetFileTypes,
   useUpdateSnippetById
 } from "../utils/queries.tsx";
 import {useFormatSnippet, useGetSnippetById, useShareSnippet} from "../utils/queries.tsx";
@@ -24,15 +25,17 @@ type SnippetDetailProps = {
 }
 
 const DownloadButton = ({snippet}: { snippet?: SnippetType }) => {
+  const {data: fileTypes} = useGetFileTypes();
   if (!snippet) return null;
   const file = new Blob([snippet.snippet], {type: 'text/plain'});
+  const extension = fileTypes?.find(ft => ft.displayName.toUpperCase() === snippet.language)?.extension || 'txt';
 
   return (
     <Tooltip title={"Download"}>
       <IconButton sx={{
         cursor: "pointer"
       }}>
-        <a download={`${snippet.name}.${snippet.version}`} target="_blank"
+        <a download={`${snippet.name}.${extension}`} target="_blank"
            rel="noreferrer" href={URL.createObjectURL(file)} style={{
           textDecoration: "none",
           color: "inherit",
