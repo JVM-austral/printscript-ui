@@ -8,7 +8,7 @@ type TabPanelProps = {
     index: number;
     value: number;
     test?: TestCase;
-    setTestCase: (test: CreateSnippetTestCase) => void;
+    setTestCase: (test : CreateSnippetTestCase & {testId?: string}) => void;
     removeTestCase?: (testIndex: string) => void;
     snippetId: string;
 }
@@ -88,7 +88,7 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                             )}
                             <Button
                                 disabled={!testData.name}
-                                onClick={() => setTestCase(testData)}
+                                onClick={() => setTestCase({...testData, testId})}
                                 variant={"outlined"}
                                 startIcon={<Save/>}
                             >

@@ -8,78 +8,104 @@ import {
   ListItemText,
   TextField,
   Typography
-} from "@mui/material";
-import { useGetFormatRules, useModifyFormatRules } from "../../utils/queries.tsx";
-import { queryClient } from "../../App.tsx";
-import { Rule } from "../../types/Rule.ts";
+} from '@mui/material';
+import { useGetFormatRules, useModifyFormatRules } from '../../utils/queries.tsx';
+import { queryClient } from '../../App.tsx';
+import { FormatRulesRecord } from '../../api/responses/rules.responses.ts';
+import {AxiosError} from "axios";
 
 const FormattingRulesList = () => {
-  const [rules, setRules] = useState<Rule[]>([]);
-
+  const [rulesRecord, setRulesRecord] = useState<FormatRulesRecord>({});
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { data, isLoading } = useGetFormatRules();
-  const { mutateAsync, isLoading: isLoadingMutate } = useModifyFormatRules({
+  const { mutateAsync, isLoading: isLoadingMutate} = useModifyFormatRules({
     onSuccess: () => queryClient.invalidateQueries('formatRules')
   });
 
   useEffect(() => {
-    setRules(data ?? []);
+    if (!data) return;
+    setRulesRecord(data);
   }, [data]);
 
-  const handleValueChange = (rule: Rule, newValue: string | number | boolean | null) => {
-    setRules(prev => prev.map(r => (r.name === rule.name ? { ...r, value: newValue } : r)));
+  const handleValueChange = (name: string, newValue: string | number | boolean | null) => {
+    setRulesRecord(prev => ({ ...prev, [name]: newValue }));
   };
 
-  const handleNumberChange = (rule: Rule) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNumberChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value);
-    handleValueChange(rule, Number.isNaN(value) ? 0 : value);
+    handleValueChange(name, Number.isNaN(value) ? 0 : value);
   };
 
-  const toggleBoolean = (rule: Rule) => () => {
-    if (typeof rule.value === 'boolean') {
-      handleValueChange(rule, !rule.value);
+  const handleStringChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleValueChange(name, event.target.value);
+  };
+
+  const toggleBoolean = (name: string) => () => {
+    setRulesRecord(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const handleSubmit = async () => {
+    setErrorMessage(null);
+    try {
+      await mutateAsync(rulesRecord);
+    } catch (e) {
+      const err = e as AxiosError;
+      const data = err.response?.data as unknown;
+      const msg =
+          typeof data === 'string'
+              ? data
+              : (data as { message?: string })?.message ?? err.message;
+      setErrorMessage(msg);
     }
   };
 
+
+  const entries = Object.entries(rulesRecord);
+
   return (
       <Card style={{ padding: 16, margin: 16 }}>
-        <Typography variant={"h6"}>Formatting rules</Typography>
+        <Typography variant="h6">Formatting rules</Typography>
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+            {errorMessage && <span style={{ color: 'red' }}>{errorMessage}</span>}
           {isLoading || isLoadingMutate ? (
               <Typography style={{ height: 80 }}>Loading...</Typography>
           ) : (
-              rules.map(rule => (
-                  <ListItem key={rule.name} disablePadding style={{ height: 40 }}>
-                    {typeof rule.value === 'boolean' && (
-                        <Checkbox
-                            edge="start"
-                            checked={rule.value}
-                            disableRipple
-                            onChange={toggleBoolean(rule)}
-                        />
-                    )}
-                    <ListItemText primary={rule.name} />
-                    {typeof rule.value === 'number' ? (
-                        <TextField
-                            type="number"
-                            variant="standard"
-                            value={rule.value}
-                            onChange={handleNumberChange(rule)}
-                        />
-                    ) : typeof rule.value === 'string' ? (
-                        <TextField
-                            variant="standard"
-                            value={rule.value}
-                            onChange={e => handleValueChange(rule, e.target.value)}
-                        />
-                    ) : null}
-                  </ListItem>
-              ))
+              entries.map(([name, value]) => {
+                const valueType = typeof value;
+                return (
+                    <ListItem key={name} disablePadding style={{ height: 40 }}>
+                      {valueType === 'boolean' && (
+                          <Checkbox
+                              edge="start"
+                              checked={Boolean(value)}
+                              disableRipple
+                              onChange={toggleBoolean(name)}
+                          />
+                      )}
+                      <ListItemText primary={name} />
+                      {valueType === 'number' ? (
+                          <TextField
+                              type="number"
+                              variant="standard"
+                              value={(value as number) ?? 0}
+                              onChange={handleNumberChange(name)}
+                          />
+                      ) : valueType === 'string' ? (
+                          <TextField
+                              variant="standard"
+                              value={(value as string) ?? ''}
+                              onChange={handleStringChange(name)}
+                          />
+                      ) : null}
+                    </ListItem>
+                );
+              })
           )}
         </List>
         <Button
             disabled={isLoading || isLoadingMutate}
             variant="contained"
-            onClick={() => mutateAsync(rules)}
+            onClick={() => handleSubmit()}
         >
           Save
         </Button>

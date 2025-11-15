@@ -19,4 +19,16 @@ export async function getLintingRules(): Promise<LintingRulesRecord> {
     return data;
 }
 
+export async function saveLintingRules(rules: LintingRulesRecord): Promise<void> {
+    const { data } = await apiClient.post("/snippet-manager/config/save-linting", rules);
+    return data;
+}
+
+export async function saveFormatRules(rules: FormatRulesRecord): Promise<string> {
+    const { data } = await apiClient.post("/snippet-manager/config/save-formatting", rules);
+    return data;
+}
+
+
+
 

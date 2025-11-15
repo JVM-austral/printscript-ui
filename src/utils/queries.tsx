@@ -4,9 +4,9 @@ import {SnippetOperations} from "./snippetOperations.ts";
 import {PaginatedUsers} from "./users.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import {FileType} from "../types/FileType.ts";
-import {Rule} from "../types/Rule.ts";
 import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
 import {SnippetManagerOperations} from "./snippetManagerOperations.ts";
+import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
 // import {useAuth0} from "@auth0/auth0-react";
 // import {useEffect} from "react";
 
@@ -82,11 +82,14 @@ export const useGetTestCases = (snippetId: string) => {
 };
 
 
-export const usePostTestCase = () => {
+export const usePostTestCase = ({onSuccess}: {onSuccess: () => void}) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<TestCase, Error, CreateSnippetTestCase>(
-      (tc) => snippetOperations.createTestCase(tc)
+  return useMutation<TestCase, Error, CreateSnippetTestCase & {testId?: string}>(
+      (tc) => snippetOperations.createTestCase(tc),
+        {
+          onSuccess,
+        }
   );
 };
 
@@ -118,13 +121,13 @@ export const useTestSnippet = () => {
 export const useGetFormatRules = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<Rule[], Error>('formatRules', () => snippetOperations.getFormatRules());
+  return useQuery<FormatRulesRecord, Error>('formatRules', () => snippetOperations.getFormatRules());
 }
 
 export const useModifyFormatRules = ({onSuccess}: {onSuccess: () => void}) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<Rule[], Error, Rule[]>(
+  return useMutation<void, Error, FormatRulesRecord>(
       rule => snippetOperations.modifyFormatRule(rule),
       {onSuccess}
   );
@@ -134,15 +137,15 @@ export const useModifyFormatRules = ({onSuccess}: {onSuccess: () => void}) => {
 export const useGetLintingRules = () => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<Rule[], Error>('lintingRules', () => snippetOperations.getLintingRules());
+  return useQuery<LintingRulesRecord, Error>('lintingRules', () => snippetOperations.getLintingRules());
 }
 
 
 export const useModifyLintingRules = ({onSuccess}: {onSuccess: () => void}) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useMutation<Rule[], Error, Rule[]>(
-      rule => snippetOperations.modifyLintingRule(rule),
+  return useMutation<void,Error, LintingRulesRecord>(
+      rules => snippetOperations.modifyLintingRule(rules),
       {onSuccess}
   );
 }

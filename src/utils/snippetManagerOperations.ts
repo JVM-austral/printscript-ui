@@ -1,7 +1,6 @@
 import { SnippetOperations } from "./snippetOperations.ts";
 import { CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet } from "../types/snippetType.ts";
 import { FileType } from "../types/FileType.ts";
-import { Rule } from "../types/Rule.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import { PaginatedUsers, User } from "./users.ts";
 import { TestCaseResult } from "./queries.tsx";
@@ -14,10 +13,23 @@ import {
   deleteSnippetById
 } from "../api/snippet.api.ts";
 import { CreateSnippetResponse } from "../api/responses/snippets.response.ts";
-import {createSnippetTest, deleteSnippetTest, getAllSnippetsTests, runSnippetTest} from "../api/tests.api.ts";
-import {formatUniqueSnippet, getFormatRules, getLintingRules} from "../api/rules.api.ts";
+import {
+  createSnippetTest,
+  deleteSnippetTest,
+  getAllSnippetsTests,
+  runSnippetTest,
+  updateSnippetTest
+} from "../api/tests.api.ts";
+import {
+  formatUniqueSnippet,
+  getFormatRules,
+  getLintingRules,
+  saveFormatRules,
+  saveLintingRules
+} from "../api/rules.api.ts";
 import {FakeSnippetStore} from "./mock/fakeSnippetStore.ts";
-import {LintingRulesRecord} from "../api/responses/rules.responses.ts";
+import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
+import {AxiosError} from "axios";
 
 
 export class SnippetManagerOperations implements SnippetOperations {
@@ -48,16 +60,13 @@ export class SnippetManagerOperations implements SnippetOperations {
   formatSnippet(content: string, snippetId: string): Promise<string> {
     return formatUniqueSnippet(content, snippetId);
   }
-  //TODO
-  async getFormatRules(): Promise<Rule[]> {
-    return await getFormatRules().then((resp: LintingRulesRecord) =>
-        Object.entries(resp).map(([name, value]) => ({name, value})));
 
+  getFormatRules(): Promise<FormatRulesRecord> {
+    return getFormatRules();
   }
 
-  async getLintingRules(): Promise<Rule[]> {
-    return await getLintingRules().then((resp: LintingRulesRecord) =>
-        Object.entries(resp).map(([name, value]) => ({name, value})));
+  getLintingRules(): Promise<LintingRulesRecord> {
+    return getLintingRules()
   }
 
   //TODO-Mocked
@@ -70,13 +79,21 @@ export class SnippetManagerOperations implements SnippetOperations {
     return new Promise(resolve => {resolve(this.fakeStore.getVersions())})
   }
 
-  //TODO
-  modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
-    return Promise.resolve(newRules);
+
+  async modifyFormatRule(newRules: FormatRulesRecord): Promise<void> {
+    try {
+      await saveFormatRules(newRules);
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        console.error(err.message, err.response?.data);
+        throw  err;
+      }
+      throw err;
+    }
   }
-  //TODO
-  modifyLintingRule(newRules: Rule[]): Promise<Rule[]> {
-    return Promise.resolve(newRules);
+
+  modifyLintingRule(newRules: LintingRulesRecord): Promise<void> {
+    return saveLintingRules(newRules);
   }
 
   // Tests
@@ -84,7 +101,10 @@ export class SnippetManagerOperations implements SnippetOperations {
     return getAllSnippetsTests(snippetId)
   }
 
-  createTestCase(testCase: CreateSnippetTestCase): Promise<TestCase> {
+  createTestCase(testCase: CreateSnippetTestCase & {testId?: string}): Promise<TestCase> {
+    if (testCase.testId != null) {
+      return updateSnippetTest(testCase as CreateSnippetTestCase & { testId: string });
+    }
     return createSnippetTest(testCase)
   }
 

@@ -9,7 +9,7 @@ import {
 } from "../utils/queries.tsx";
 import {useFormatSnippet, useGetSnippetById, useShareSnippet} from "../utils/queries.tsx";
 import {Bòx} from "../components/snippet-table/SnippetBox.tsx";
-import {BugReport, Delete, Download, PlayArrow, Save, Share, StopRounded} from "@mui/icons-material";
+import {BugReport, Delete, Download, Save, Share} from "@mui/icons-material";
 import {ShareSnippetModal} from "../components/snippet-detail/ShareSnippetModal.tsx";
 import {TestSnippetModal} from "../components/snippet-test/TestSnippetModal.tsx";
 import {SnippetExecution} from "./SnippetExecution.tsx";
@@ -17,7 +17,6 @@ import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import {queryClient} from "../App.tsx";
 import {DeleteConfirmationModal} from "../components/snippet-detail/DeleteConfirmationModal.tsx";
 import {SnippetType} from "../types/snippetType.ts";
-import {useRunSnippet} from "../hooks/useRunSnippet.ts";
 
 type SnippetDetailProps = {
   id: string;
@@ -59,7 +58,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   const {data: snippet, isLoading} = useGetSnippetById(id);
   const {mutate: shareSnippet, isLoading: loadingShare} = useShareSnippet()
   const {mutate: formatSnippet, isLoading: isFormatLoading, data: formatSnippetData} = useFormatSnippet()
-  const {mutate: updateSnippet, isLoading: isUpdateSnippetLoading} = useUpdateSnippetById({onSuccess: () => queryClient.invalidateQueries(['snippet', id])})
+  const {mutate: updateSnippet, isLoading: isUpdateSnippetLoading, isError: saveError} = useUpdateSnippetById({onSuccess: () => queryClient.invalidateQueries(['snippet', id])})
 
   useEffect(() => {
     if (snippet) {
@@ -72,16 +71,6 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
       setCode(formatSnippetData)
     }
   }, [formatSnippetData])
-
-  const { run, stop, isRunning} = useRunSnippet();
-
-  const handleRunClick = () => {
-    if (isRunning) {
-      stop();
-    } else {
-      run({ snippetId: id });
-    }
-  };
 
   async function handleShareSnippet(userId: string) {
     shareSnippet({snippetId: id, userId})
@@ -110,11 +99,11 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                 </IconButton>
               </Tooltip>
               <DownloadButton snippet={snippet}/>
-              <Tooltip title={isRunning ? "Stop run" : "Run"}>
-                <IconButton onClick={() => handleRunClick()}>
-                  {isRunning ? <StopRounded/> : <PlayArrow/>}
-                </IconButton>
-              </Tooltip>
+              {/*<Tooltip title={isRunning ? "Stop run" : "Run"}>*/}
+              {/*  <IconButton onClick={() => handleRunClick()}>*/}
+              {/*    {isRunning ? <StopRounded/> : <PlayArrow/>}*/}
+              {/*  </IconButton>*/}
+              {/*</Tooltip>*/}
               <Tooltip title={"Format"}>
                 <IconButton onClick={() => formatSnippet({snippetId:id, snippetContent: code})} disabled={isFormatLoading}>
                   <ReadMoreIcon />
@@ -137,6 +126,11 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                             )}
                             disabled={isUpdateSnippetLoading || snippet?.snippet === code} >
                   <Save />
+                  {saveError &&
+                      <Typography color={"error"} variant={"body2"} ml={1}>
+                        Error saving snippet
+                      </Typography>
+                  }
                 </IconButton>
               </Tooltip>
               <Tooltip title={"Delete"}>

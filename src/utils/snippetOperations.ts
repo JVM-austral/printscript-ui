@@ -3,8 +3,8 @@ import {PaginatedUsers} from "./users.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
 import {TestCaseResult} from "./queries.tsx";
 import {FileType} from "../types/FileType.ts";
-import {Rule} from "../types/Rule.ts";
 import {CreateSnippetResponse} from "../api/responses/snippets.response.ts";
+import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
 
 export interface SnippetOperations {
   listSnippetDescriptors(page: number,pageSize: number,sippetName?: string): Promise<PaginatedSnippets>
@@ -19,15 +19,15 @@ export interface SnippetOperations {
 
   shareSnippet(snippetId: string,userId: string): Promise<SnippetType>
 
-  getFormatRules(): Promise<Rule[]>
+  getFormatRules(): Promise<FormatRulesRecord>
 
-  getLintingRules(): Promise<Rule[]>
+  getLintingRules(): Promise<LintingRulesRecord>
 
   getTestCases(snippetId: string): Promise<TestCase[]>
 
   formatSnippet(snippet: string, snippetId: string): Promise<string>
 
-  createTestCase(testCase: CreateSnippetTestCase): Promise<TestCase>
+  createTestCase(testCase: CreateSnippetTestCase & {testId?: string}): Promise<TestCase>
 
   removeTestCase(id: string): Promise<string>
 
@@ -39,7 +39,7 @@ export interface SnippetOperations {
 
   getVersion() : Promise<string[]>
 
-  modifyFormatRule(newRules: Rule[]): Promise<Rule[]>
+  modifyFormatRule(newRules: FormatRulesRecord): Promise<void>
 
-  modifyLintingRule(newRules: Rule[]): Promise<Rule[]>
+  modifyLintingRule(newRules: LintingRulesRecord): Promise<void>
 }

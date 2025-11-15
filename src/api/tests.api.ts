@@ -16,8 +16,8 @@ export async function deleteSnippetTest(testCaseId: string): Promise<string> {
     return data;
 }
 
-export async function updateSnippetTest(input : CreateSnippetTestCase & {id: string}): Promise<TestCase> {
-    const { data } = await apiClient.patch(`/snippet-manager/testing/update`, input);
+export async function updateSnippetTest(input : CreateSnippetTestCase & {testId: string}): Promise<TestCase> {
+    const { data } = await apiClient.put(`/snippet-manager/testing/edit`, input);
     return data;
 }
 

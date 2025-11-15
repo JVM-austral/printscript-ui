@@ -38,6 +38,8 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     })
     const {data: fileTypes} = useGetFileTypes();
     const {data: versions} = useGetVersions();
+    const [saveError, setSaveError] = useState(false);
+    const [saveErrorsList, setSaveErrorsList] = useState<string[]>([]);
 
     const handleCreateSnippet = async () => {
         const newSnippet: CreateSnippet = {
@@ -47,7 +49,12 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
             description: description,
             version: version
         }
-        await createSnippet(newSnippet);
+        const saveResponse = await createSnippet(newSnippet);
+        if(saveResponse.errorMessage){
+            setSaveError(true);
+            setSaveErrorsList(saveResponse.errorMessage)
+            return;
+        }
         onClose();
     }
 
@@ -69,7 +76,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                                 sx={{display: 'flex', alignItems: 'center'}}>
                         Add Snippet
                     </Typography>
-                    <Button disabled={!snippetName || !code || !language || loadingSnippet} variant="contained"
+                    <Button disabled={!snippetName || !code || !language || loadingSnippet || !version} variant="contained"
                             disableRipple
                             sx={{boxShadow: 0}} onClick={handleCreateSnippet}>
                         <Box pr={1} display={"flex"} alignItems={"center"} justifyContent={"center"}>
@@ -149,6 +156,11 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                 </Box>
             </div>
             <InputLabel>Code Snippet</InputLabel>
+            {saveError &&
+                <Typography color={"error"} variant={"body2"} ml={1}>
+                    {saveErrorsList}
+                </Typography>
+            }
             <Box width={"100%"} sx={{
                 backgroundColor: 'black', color: 'white', borderRadius: "8px",
             }}>

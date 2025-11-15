@@ -18,7 +18,9 @@ export const TestSnippetModal = ({open, onClose, snippetId}: TestSnippetModalPro
     const [testCases , setTestCases] = useState<TestCase[]>([]);
 
     const {data: testCasesResponse, isLoading: isGettingTestLoading} = useGetTestCases(snippetId);
-    const {mutateAsync: postTestCase, isLoading: isPostTestLoading} = usePostTestCase();
+    const {mutateAsync: postTestCase, isLoading: isPostTestLoading} = usePostTestCase({
+        onSuccess: () => queryClient.invalidateQueries('testCases')
+    });
     const {mutateAsync: removeTestCase} = useRemoveTestCase({
         onSuccess: () => queryClient.invalidateQueries('testCases')
     });
