@@ -2,12 +2,12 @@ permissions:
   contents: read
   packages: write
 
-name: UI CI/CD - Dev
+name: UI CI/CD - Prod
 
 on:
   push:
     branches:
-      - master
+      - prod
 
 jobs:
   build:
@@ -65,19 +65,19 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}:latest
-            ghcr.io/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}:${{ github.sha }}
+            ghcr.io/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}:prod-latest
+            ghcr.io/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}:prod-${{ github.sha }}
 
   deploy:
     needs: push_to_registry
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to VM
+      - name: Deploy to Prod VM
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          host: ${{ secrets.VM_HOST_PROD }}
+          username: ${{ secrets.VM_USER_PROD }}
+          key: ${{ secrets.VM_SSH_KEY_PROD }}
           script: |
             cd ~/infrastructure
-            ./deploy.dev.sh
+            ./deploy.prod.sh
