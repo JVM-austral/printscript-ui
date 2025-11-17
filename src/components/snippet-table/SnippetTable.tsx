@@ -39,7 +39,7 @@ export const SnippetTable = (props: SnippetTableProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const {page, page_size: pageSize, count, handleChangePageSize, handleGoToPage} = usePaginationContext()
   const {createSnackbar} = useSnackbarContext()
-  const {data: fileType} = useGetFileTypes();
+  const {data: fileTypes} = useGetFileTypes();
 
   const handleLoadSnippet = async (target: EventTarget & HTMLInputElement) => {
     const files = target.files
@@ -49,17 +49,18 @@ export const SnippetTable = (props: SnippetTableProps) => {
     }
     const file = files[0]
     const splitName = file.name.split(".")
-    if (!fileType) {
+
+    if (!fileTypes) {
       createSnackbar('error', `File type ${splitName.at(-1)} not supported`)
       return
     }
     file.text().then((text) => {
       setSnippet({
-        description: "",
-        version: "",
+        description: "some description",
+        version: "V2",
         name: splitName[0],
         snippet: text,
-        language: fileType.find(ft => ft.displayName === splitName.at(-1))?.displayName.toLowerCase() || "plain-text",
+        language: fileTypes.find(ft => ft.displayName === splitName.at(-1))?.displayName.toLowerCase() || "plain-text",
       })
     }).catch(e => {
       console.error(e)

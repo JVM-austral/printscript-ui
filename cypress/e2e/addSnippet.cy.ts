@@ -9,9 +9,9 @@ describe('Add snippet tests', () => {
   })
   it('Can add snippets manually', () => {
     cy.visit("/")
-    cy.intercept('POST', BACKEND_URL+"/snippets", (req) => {
+    cy.intercept('POST', BACKEND_URL+"/snippet-manager/snippets", (req) => {
       req.reply((res) => {
-        expect(res.body).to.include.keys("id","name","snippet","language")
+        expect(res.body).to.include.keys("id","name","version","language")
         expect(res.statusCode).to.eq(200);
       });
     }).as('postRequest');
@@ -21,10 +21,10 @@ describe('Add snippet tests', () => {
     cy.get('.MuiList-root > [tabindex="0"]').click();
     cy.get('#name').type('Some snippet name');
     cy.get('#demo-simple-select').click()
-    cy.get('[data-testid="menu-option-printscript"]').click()
+    cy.get('[data-testid="menu-option-PrintScript"]').click()
 
     cy.get('[data-testid="add-snippet-code-editor"]').click();
-    cy.get('[data-testid="add-snippet-code-editor"]').type(`const snippet: String = "some snippet" \n print(snippet)`);
+    cy.get('[data-testid="add-snippet-code-editor"]').type(`const snippet: string = "some snippet"; \n println(snippet);`);
     cy.get('[data-testid="SaveIcon"]').click();
 
     cy.wait('@postRequest').its('response.statusCode').should('eq', 200);
@@ -32,13 +32,19 @@ describe('Add snippet tests', () => {
 
   it('Can add snippets via file', () => {
     cy.visit("/")
-    cy.intercept('POST', BACKEND_URL+"/snippets", (req) => {
+    cy.intercept('POST', BACKEND_URL+"/snippet-manager/snippets", (req) => {
       req.reply((res) => {
-        expect(res.body).to.include.keys("id","name","snippet","language")
+        expect(res.body).to.include.keys("id","name","version","language")
         expect(res.statusCode).to.eq(200);
       });
     }).as('postRequest');
 
+    cy.intercept('GET', BACKEND_URL+'/snippet-manager/snippets/languages', (req) => {
+      req.reply((res) => {
+        expect(res.statusCode).to.eq(200);
+      })}).as('getLanguages');
+    +
+    cy.wait('@getLanguages').its('response.statusCode').should('eq', 200);
     /* ==== Generated with Cypress Studio ==== */
     cy.get('[data-testid="upload-file-input"').selectFile("cypress/fixtures/example_ps.ps", {force: true})
 

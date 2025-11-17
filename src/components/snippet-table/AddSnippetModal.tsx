@@ -83,46 +83,43 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                     </Button>
                 </Box>
             }
-            <div style={{ display: 'flex', flexDirection: 'row', minWidth: '300px', gap: '24px', marginBottom: '16px' }}>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px'
-                }}>
-                    <InputLabel htmlFor="name">Name</InputLabel>
-                    <Input onChange={e => setSnippetName(e.target.value)} value={snippetName} id="name"
-                           sx={{width: '80%'}}/>
-                </Box>
-            </div>
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
-                width: '60%'
+                gap: '16px'
+            }}>
+                <InputLabel htmlFor="name">Name</InputLabel>
+                <Input onChange={e => setSnippetName(e.target.value)} value={snippetName} id="name"
+                       sx={{width: '50%'}}/>
+            </Box>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
             }}>
                 <InputLabel htmlFor="name">Language</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={language}
-                    label="Language"
-                    onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)}
+                    label="Age"
+                    onChange={(e: SelectChangeEvent<string>) => setLanguage(e.target.value)}
                     sx={{width: '50%'}}
                 >
-                    {fileTypes?.map(x => (
-                        <MenuItem data-testid={`menu-option-${x.displayName}`} key={x.displayName} value={x.displayName}>
-                            {capitalize(x.displayName)}
-                        </MenuItem>
-                    ))}
+                    {
+                        fileTypes?.map(x => (
+                            <MenuItem data-testid={`menu-option-${x.displayName}`} key={x.displayName}
+                                      value={x.displayName}>{capitalize((x.displayName))}</MenuItem>
+                        ))
+                    }
                 </Select>
             </Box>
-
-            <InputLabel>Code Snippet</InputLabel>
             {saveError &&
                 <Typography color={"error"} variant={"body2"} ml={1}>
                     {saveErrorsList}
                 </Typography>
             }
+            <InputLabel>Code Snippet</InputLabel>
             <Box width={"100%"} sx={{
                 backgroundColor: 'black', color: 'white', borderRadius: "8px",
             }}>
@@ -146,4 +143,3 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
         </ModalWrapper>
     )
 }
-
