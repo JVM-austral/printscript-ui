@@ -27,7 +27,8 @@ type SnippetStatus = {
   compliance: ComplianceEnum;
   author: string;
 }
-export type PaginatedSnippets = Pagination & {
+export type PaginatedSnippets = {
+  pagination: Pagination
   snippets: SnippetType[]
 }
 
