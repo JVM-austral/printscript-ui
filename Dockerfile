@@ -1,15 +1,29 @@
 FROM node:20-alpine AS builder
+
 WORKDIR /app
+
 COPY package*.json ./
+
 RUN npm ci
+
 COPY . .
+
+ARG VITE_API_URL
+ARG VITE_FRONTEND_URL
+ARG VITE_WS_URL
+ARG VITE_AUTH0_DOMAIN
+ARG VITE_AUTH0_CLIENT_ID
+
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_FRONTEND_URL=$VITE_FRONTEND_URL
+ENV VITE_WS_URL=$VITE_WS_URL
+ENV VITE_AUTH0_DOMAIN=$VITE_AUTH0_DOMAIN
+ENV VITE_AUTH0_CLIENT_ID=$VITE_AUTH0_CLIENT_ID
+
 RUN npm run build
 
 FROM nginx:alpine
+
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
