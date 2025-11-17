@@ -1,5 +1,5 @@
 export type CreateSnippetResponse = {
-    snippetId: string;
+    id: string;
     errorMessage: string[];
 }
 

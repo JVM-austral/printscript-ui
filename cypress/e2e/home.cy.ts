@@ -37,7 +37,7 @@ describe('Home', () => {
     cy.visit(FRONTEND_URL)
     const snippetData: CreateSnippet = {
       name: "Test name",
-      snippet: "print(1);",
+      snippet: "println(1);",
       language: "PRINTSCRIPT",
       description: "Some description",
       version: "V2"
@@ -59,7 +59,7 @@ describe('Home', () => {
       expect(response.status).to.eq(200);
 
       expect(response.body.name).to.eq(snippetData.name)
-      expect(response.body.content).to.eq(snippetData.snippet)
+      expect(response.body.description).to.eq(snippetData.description)
       expect(response.body.language).to.eq(snippetData.language)
       expect(response.body).to.haveOwnProperty("id")
 
