@@ -49,8 +49,12 @@ export class SnippetManagerOperations implements SnippetOperations {
     return getSnippetById(id);
   }
 
-  listSnippetDescriptors(page: number, pageSize: number): Promise<PaginatedSnippets> {
-    return getAllSnippets({ page, page_size: pageSize });
+  listSnippetDescriptors(page: number, pageSize: number, snippetName? : string): Promise<PaginatedSnippets> {
+    if (snippetName){
+      return getAllSnippets({ page, page_size: pageSize, filter: snippetName });
+
+    }
+    return getAllSnippets({ page, page_size: pageSize});
   }
 
   // Format and Linting
