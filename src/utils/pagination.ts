@@ -7,4 +7,5 @@ export type Pagination = {
 export type PaginationParams = {
   page: number,
   page_size: number,
+  filter?: string
 }

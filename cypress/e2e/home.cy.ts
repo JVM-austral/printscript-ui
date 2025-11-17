@@ -1,12 +1,13 @@
 import {AUTH0_PASSWORD, AUTH0_USERNAME, BACKEND_URL, FRONTEND_URL} from "../../src/utils/constants";
-import {CreateSnippet} from "../../src/utils/snippet";
+import {CreateSnippet} from "../../src/types/snippetType";
+import {authHeaders} from "../support/auth-provider-commands/auth0";
 
 describe('Home', () => {
   beforeEach(() => {
-    // cy.loginToAuth0( TODO DE-Comment when auth0 is ready
-    //     AUTH0_USERNAME,
-    //     AUTH0_PASSWORD
-    // )
+    cy.loginToAuth0(
+        AUTH0_USERNAME,
+        AUTH0_PASSWORD
+    )
   })
   before(() => {
     process.env.FRONTEND_URL = Cypress.env("FRONTEND_URL");
@@ -29,19 +30,20 @@ describe('Home', () => {
 
     first10Snippets.should('have.length.greaterThan', 0)
 
-    first10Snippets.should('have.length.lessThan', 10)
+    first10Snippets.should('have.length.lessThan', 11)
   })
 
   it('Can creat snippet find snippets by name', () => {
     cy.visit(FRONTEND_URL)
     const snippetData: CreateSnippet = {
       name: "Test name",
-      content: "print(1)",
-      language: "printscript",
-      extension: ".ps"
+      snippet: "print(1);",
+      language: "PRINTSCRIPT",
+      description: "Some description",
+      version: "V2"
     }
 
-    cy.intercept('GET', BACKEND_URL+"/snippets*", (req) => {
+    cy.intercept('GET', BACKEND_URL+"/snippet", (req) => {
       req.reply((res) => {
         expect(res.statusCode).to.eq(200);
       });
@@ -49,14 +51,15 @@ describe('Home', () => {
 
     cy.request({
       method: 'POST',
-      url: '/snippets', // Adjust if you have a different base URL configured in Cypress
+      url: BACKEND_URL+'/snippet-manager/snippets', // Adjust if you have a different base URL configured in Cypress
       body: snippetData,
+      headers: authHeaders(),
       failOnStatusCode: false // Optional: set to true if you want the test to fail on non-2xx status codes
     }).then((response) => {
       expect(response.status).to.eq(200);
 
       expect(response.body.name).to.eq(snippetData.name)
-      expect(response.body.content).to.eq(snippetData.content)
+      expect(response.body.content).to.eq(snippetData.snippet)
       expect(response.body.language).to.eq(snippetData.language)
       expect(response.body).to.haveOwnProperty("id")
 

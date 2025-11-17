@@ -31,8 +31,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     const [language, setLanguage] = useState(defaultSnippet?.language ?? "printscript");
     const [code, setCode] = useState(defaultSnippet?.snippet ?? "");
     const [snippetName, setSnippetName] = useState(defaultSnippet?.name ?? "")
-    const [version, setVersion] = useState(defaultSnippet?.version ?? "");
-    const [description, setDescription] = useState(defaultSnippet?.description ?? "");
+    const [description, setDescription] = useState(defaultSnippet?.description ?? "fake description");
     const {mutateAsync: createSnippet, isLoading: loadingSnippet} = useCreateSnippet({
         onSuccess: () => queryClient.invalidateQueries('listSnippets')
     })
@@ -46,7 +45,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
             snippet: code,
             language: language,
             description: description,
-            version: version
+            version: "V2"
         }
         const saveResponse = await createSnippet(newSnippet);
         if(saveResponse.errorMessage.length > 0){
@@ -62,7 +61,6 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
             setCode(defaultSnippet?.snippet)
             setLanguage(defaultSnippet?.language)
             setSnippetName(defaultSnippet?.name)
-            setVersion(defaultSnippet?.version)
             setDescription(defaultSnippet?.description)
         }
     }, [defaultSnippet]);
@@ -75,7 +73,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                                 sx={{display: 'flex', alignItems: 'center'}}>
                         Add Snippet
                     </Typography>
-                    <Button disabled={!snippetName || !code || !language || loadingSnippet || !version} variant="contained"
+                    <Button disabled={!snippetName || !code || !language || loadingSnippet} variant="contained"
                             disableRipple
                             sx={{boxShadow: 0}} onClick={handleCreateSnippet}>
                         <Box pr={1} display={"flex"} alignItems={"center"} justifyContent={"center"}>
@@ -95,69 +93,30 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                     <Input onChange={e => setSnippetName(e.target.value)} value={snippetName} id="name"
                            sx={{width: '80%'}}/>
                 </Box>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px'
-                }}>
-                    <InputLabel htmlFor="name">Description</InputLabel>
-                    <Input onChange={e => setDescription(e.target.value)} value={description} id="description"
-                           sx={{width: '100%'}}/>
-                </Box>
             </div>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                width: '60%'
+            }}>
+                <InputLabel htmlFor="name">Language</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={language}
+                    label="Language"
+                    onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)}
+                    sx={{width: '50%'}}
+                >
+                    {fileTypes?.map(x => (
+                        <MenuItem data-testid={`menu-option-${x.displayName}`} key={x.displayName} value={x.displayName}>
+                            {capitalize(x.displayName)}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </Box>
 
-            <div style={{ display: 'flex', flexDirection: 'row', minWidth: '300px', gap: '24px', marginBottom: '16px' }}>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                    width: '60%'
-                }}>
-                    <InputLabel htmlFor="name">Language</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={language}
-                        label="Language"
-                        onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)}
-                        sx={{width: '50%'}}
-                    >
-                        {fileTypes?.map(x => (
-                            <MenuItem data-testid={`menu-option-${x.displayName}`} key={x.displayName} value={x.displayName}>
-                                {capitalize(x.displayName)}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
-                {language && (fileTypes?.find(ft => ft.displayName === language)?.versions?.length ?? 0) > 0 && (
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '16px',
-                        width: '15%'
-                    }}>
-                        <InputLabel htmlFor="name">Version</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={version}
-                            label="Version"
-                            onChange={(e: SelectChangeEvent) => setVersion(e.target.value)}
-                            sx={{width: '100%'}}
-                        >
-                            {fileTypes
-                                ?.find(ft => ft.displayName === language)
-                                ?.versions
-                                ?.map((v: string) => (
-                                    <MenuItem data-testid={`menu-option-${v}`} key={v} value={v}>
-                                        {capitalize(v)}
-                                    </MenuItem>
-                                ))
-                            }
-                        </Select>
-                    </Box>
-                )}
-            </div>
             <InputLabel>Code Snippet</InputLabel>
             {saveError &&
                 <Typography color={"error"} variant={"body2"} ml={1}>

@@ -122,7 +122,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                                         name: snippet?.name ?? "",
                                         description: snippet?.description ?? "",
                                         language: snippet?.language ?? "",
-                                        version: snippet?.version ?? ""
+                                        version: snippet?.version ?? "V2"
                                       }
                                         , id
                                 }
