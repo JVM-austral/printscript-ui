@@ -1,7 +1,7 @@
 import {BACKEND_URL} from "../../../src/utils/constants";
 
 export function loginViaAuth0Ui(username: string, password: string) {
-    const auth0Domain = Cypress.env("AUTH0_DOMAIN");
+    const auth0Domain = Cypress.env("VITE_AUTH0_DOMAIN");
 
     if (!auth0Domain) {
         throw new Error("AUTH0_DOMAIN is missing in Cypress.env");
@@ -15,19 +15,19 @@ export function loginViaAuth0Ui(username: string, password: string) {
         `https://${auth0Domain}`,
         { args: { username, password } },
         ({ username, password }) => {
-            cy.get('input#username').type(username);
-            cy.get('input#password').type(password, { log: false });
-            cy.contains('button[value=default]', 'Continue').click();
+            cy.get('input#username').type(username, {force: true});
+            cy.get('input#password').type(password, { log: false, force: true });
+            cy.contains('button[value=default]', 'Continue').click({force: true});
         }
     );
 
     // Verify redirect back to frontend
-    cy.url().should("eq", Cypress.config("baseUrl") + "/");
+    cy.url().should("eq", Cypress.config("baseUrl") );
 }
 
 export function fakeLoginViaAuth0Ui(username: string, password: string) {
 
-    const RAW_JWT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InFVTUNOWGxqN2pCRmZkWE1MT0dOTSJ9.eyJpc3MiOiJodHRwczovL2Rldi1wMTdoYXByem9uZzA2em93LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2OGYxYWFlMTYwMGVlNWE2ZDhkMzk1MjUiLCJhdWQiOiJodHRwczovL2F1dGgtbWljcm9zZXJ2aWNlL2FwaSIsImlhdCI6MTc2MzMyMDY5MywiZXhwIjoxNzYzNDA3MDkzLCJzY29wZSI6InJlYWQ6c25pcHBldHMgd3JpdGU6c25pcHBldHMiLCJndHkiOiJwYXNzd29yZCIsImF6cCI6Ikx6VXE2N2YzSWpBeURnM2xjNVBCWnFBTEZYbjRwd0hjIn0.WmdtDRz1qi3G3yQ7HI9tUBkB8cbJvLGZoIRIdw7I2HCNB_naCBmr-L397wsShYFfqiLnfApb0RsBgYLPpkcL6hOEtIAwxoZ03CrHVRkfIKhQpBhXkGN11KV0NSb7sfUVv9ICDnkx6smhz4tU6K-z9hD7BTFH6edTR7AjfnArX3np1bMqJk-1Mr5nWFH_5kizmlPGYNKtz4KRWKqBKKVswCm6Ucz7e0nTdcPLj8P3BHkkRTVr-ojebrNdeVTge8H-n6r8dHyWubSygt-AgK0Mq2iTGIU2JFajw9JHq8CZk52JPlxfViJoVOFyi9fQfNPlzizj_qQ4qOyQanHbkG2ttQ"
+    const RAW_JWT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InFVTUNOWGxqN2pCRmZkWE1MT0dOTSJ9.eyJpc3MiOiJodHRwczovL2Rldi1wMTdoYXByem9uZzA2em93LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2OGYxYWFlMTYwMGVlNWE2ZDhkMzk1MjUiLCJhdWQiOiJodHRwczovL2F1dGgtbWljcm9zZXJ2aWNlL2FwaSIsImlhdCI6MTc2MzQwNzI4MCwiZXhwIjoxNzYzNDkzNjgwLCJzY29wZSI6InJlYWQ6c25pcHBldHMgd3JpdGU6c25pcHBldHMiLCJndHkiOiJwYXNzd29yZCIsImF6cCI6Ikx6VXE2N2YzSWpBeURnM2xjNVBCWnFBTEZYbjRwd0hjIn0.uhJEsXxq45VShwl89JBHGkRXriGJ0lmk_RXdwGfXTWlvqg_xrHlL0wX83nILBMd-wmT2av7paBuUiK4_2AfIH3Aak3Sx89pOSUzjKdH9-z1jrRLHU0q9m1HqF68oAmYUC8ljJx_HwdTjvyT0duq3JVJcOvXS8gLa4N3YzWZBcpMWOT5ojC8BDXmmc4zZx1DrnprFcZMv3wwWEdS0MMA5r0OKyfctdz8B8wmBrRHYqRY3-gUJ7L5zHyBpvja-VSEk3fphDjecwDPXERNNbNlxZp52JS0vm1UQYw8074NO3vOuu0QffDnmftv8Fheu3mS3wyZyEm5sKEH-WxuUjgfGdw";
     if (!RAW_JWT_TOKEN) {
         throw new Error("You must paste a raw JWT in RAW_JWT_TOKEN");
     }

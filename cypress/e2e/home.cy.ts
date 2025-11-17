@@ -1,12 +1,14 @@
-import {AUTH0_PASSWORD, AUTH0_USERNAME, BACKEND_URL, FRONTEND_URL} from "../../src/utils/constants";
+import {BACKEND_URL, FRONTEND_URL} from "../../src/utils/constants";
 import {CreateSnippet} from "../../src/types/snippetType";
 import {authHeaders} from "../support/auth-provider-commands/auth0";
 
 describe('Home', () => {
   beforeEach(() => {
+    const auth0_username = Cypress.env("AUTH0_USERNAME");
+    const auth0_password = Cypress.env("AUTH0_PASSWORD");
     cy.loginToAuth0(
-        AUTH0_USERNAME,
-        AUTH0_PASSWORD
+        auth0_username,
+        auth0_password
     )
   })
   before(() => {
@@ -43,7 +45,7 @@ describe('Home', () => {
       version: "V2"
     }
 
-    cy.intercept('GET', BACKEND_URL+"/snippet", (req) => {
+    cy.intercept('GET', BACKEND_URL+"/snippet-manager/snippets**", (req) => {
       req.reply((res) => {
         expect(res.statusCode).to.eq(200);
       });

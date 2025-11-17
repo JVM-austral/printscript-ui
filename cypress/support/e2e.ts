@@ -15,7 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-import {fakeLoginViaAuth0Ui, loginViaAuth0Ui} from "./auth-provider-commands/auth0";
+import {loginViaAuth0Ui} from "./auth-provider-commands/auth0";
 
 Cypress.Commands.add('loginToAuth0', (username: string, password: string) => {
   const log = Cypress.log({
@@ -28,13 +28,13 @@ Cypress.Commands.add('loginToAuth0', (username: string, password: string) => {
   cy.session(
       `auth0-${username}`,
       () => {
-        fakeLoginViaAuth0Ui(username, password)
+        loginViaAuth0Ui(username, password)
       },
       {
         validate: () => {
           // Validate presence of access token in localStorage.
           cy.wrap(localStorage)
-              .invoke('getItem', 'authAccessToken')
+              .invoke('getItem', 'auth_token')
               .should('exist')
         },
       }
