@@ -10,7 +10,7 @@ import {
 } from "../utils/queries.tsx";
 import {useFormatSnippet, useGetSnippetById, useShareSnippet} from "../utils/queries.tsx";
 import {Bòx} from "../components/snippet-table/SnippetBox.tsx";
-import {BugReport, Delete, Download, Save, Share} from "@mui/icons-material";
+import {BugReport, Delete, Download, PlayArrow, Save, Share, StopRounded} from "@mui/icons-material";
 import {ShareSnippetModal} from "../components/snippet-detail/ShareSnippetModal.tsx";
 import {TestSnippetModal} from "../components/snippet-test/TestSnippetModal.tsx";
 import {SnippetExecution} from "./SnippetExecution.tsx";
@@ -18,6 +18,7 @@ import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import {queryClient} from "../App.tsx";
 import {DeleteConfirmationModal} from "../components/snippet-detail/DeleteConfirmationModal.tsx";
 import {SnippetType} from "../types/snippetType.ts";
+import {useRunSnippet} from "../hooks/useRunSnippet.ts";
 
 type SnippetDetailProps = {
   id: string;
@@ -57,6 +58,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   const [shareModalOpened, setShareModalOpened] = useState(false)
   const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false)
   const [testModalOpened, setTestModalOpened] = useState(false);
+  const { run, stop, isRunning, data: codeOutput} = useRunSnippet();
 
   const {data: snippet, isLoading} = useGetSnippetById(id);
   const {mutate: shareSnippet, isLoading: loadingShare} = useShareSnippet()
@@ -68,6 +70,14 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
       setCode(snippet.snippet);
     }
   }, [snippet]);
+
+  const handleRunClick = () => {
+    if (isRunning) {
+      stop();
+    } else {
+      run({ snippetId: id });
+    }
+  };
 
   useEffect(() => {
     if (formatSnippetData) {
@@ -102,11 +112,11 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                 </IconButton>
               </Tooltip>
               <DownloadButton snippet={snippet}/>
-              {/*<Tooltip title={isRunning ? "Stop run" : "Run"}>*/}
-              {/*  <IconButton onClick={() => handleRunClick()}>*/}
-              {/*    {isRunning ? <StopRounded/> : <PlayArrow/>}*/}
-              {/*  </IconButton>*/}
-              {/*</Tooltip>*/}
+              <Tooltip title={isRunning ? "Stop run" : "Run"}>
+                <IconButton onClick={() => handleRunClick()}>
+                  {isRunning ? <StopRounded/> : <PlayArrow/>}
+                </IconButton>
+              </Tooltip>
               <Tooltip title={"Format"}>
                 <IconButton onClick={() => formatSnippet({snippetId:id, snippetContent: code})} disabled={isFormatLoading}>
                   <ReadMoreIcon />
@@ -160,7 +170,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
             </Box>
             <Box pt={1} flex={1} marginTop={2}>
               <Alert severity="info">Output</Alert>
-              <SnippetExecution id={id}/>
+              <SnippetExecution id={id} codeOutput={codeOutput ? codeOutput.output.flat().join("\n") : ""} />
             </Box>
           </>
         }

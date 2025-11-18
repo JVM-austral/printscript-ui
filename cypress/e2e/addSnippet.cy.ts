@@ -1,10 +1,12 @@
-import {AUTH0_PASSWORD, AUTH0_USERNAME, BACKEND_URL} from "../../src/utils/constants";
+import {BACKEND_URL} from "../../src/utils/constants";
 
 describe('Add snippet tests', () => {
   beforeEach(() => {
+    const auth0_username = Cypress.env("AUTH0_USERNAME");
+    const auth0_password = Cypress.env("AUTH0_PASSWORD");
     cy.loginToAuth0(
-        AUTH0_USERNAME,
-        AUTH0_PASSWORD
+        auth0_username,
+        auth0_password
     )
   })
   it('Can add snippets manually', () => {

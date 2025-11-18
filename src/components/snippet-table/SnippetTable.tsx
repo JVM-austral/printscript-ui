@@ -60,7 +60,7 @@ export const SnippetTable = (props: SnippetTableProps) => {
         version: "V2",
         name: splitName[0],
         snippet: text,
-        language: fileTypes.find(ft => ft.displayName === splitName.at(-1))?.displayName.toLowerCase() || "plain-text",
+        language: fileTypes.find(ft => ft.extension === splitName.at(-1))?.displayName || "plain-text",
       })
     }).catch(e => {
       console.error(e)
