@@ -1,12 +1,11 @@
 import { SnippetOperations } from "./snippetOperations.ts";
 import { CreateSnippet, PaginatedSnippets, SnippetType, UpdateSnippet } from "../types/snippetType.ts";
 import {CreateSnippetTestCase, TestCase} from "../types/TestCase.ts";
-import { PaginatedUsers, User } from "./users.ts";
+import { PaginatedUsers} from "./users.ts";
 import { TestCaseResult } from "./queries.tsx";
 import {
   createSnippet,
   updateSnippet,
-  shareSnippet,
   getSnippetById,
   getAllSnippets,
   deleteSnippetById, getLanguages
@@ -28,6 +27,7 @@ import {
 } from "../api/rules.api.ts";
 import {FormatRulesRecord, LintingRulesRecord} from "../api/responses/rules.responses.ts";
 import {AxiosError} from "axios";
+import {getPaginatedUsers, shareSnippet} from "../api/users.api.ts";
 
 
 export class SnippetManagerOperations implements SnippetOperations {
@@ -79,7 +79,6 @@ export class SnippetManagerOperations implements SnippetOperations {
       await saveFormatRules(newRules);
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
-        console.error(err.message, err.response?.data);
         throw  err;
       }
       throw err;
@@ -113,22 +112,19 @@ export class SnippetManagerOperations implements SnippetOperations {
   }
 
   // Users
-  //TODO
   getUserFriends(name?: string, page?: number, pageSize?: number): Promise<PaginatedUsers> {
-    const friend: User = {
-      id: "1",
-      name: name || "Friend Name",
-    };
-    const user: PaginatedUsers = {
-      users: [friend],
-      page: page || 0,
-      page_size: pageSize || 10,
-      count: 1,
-    };
-    return Promise.resolve(user);
+    return getPaginatedUsers({page: page ?? 1, page_size: pageSize ?? 10, filter: name});
   }
 
   shareSnippet(snippetId: string, targetUserId: string): Promise<SnippetType> {
-    return shareSnippet({ snippetId, targetUserId });
+    try {
+      return shareSnippet({ snippetId, targetUserId });
+    }
+    catch (err) {
+      if (err instanceof AxiosError) {
+        throw  err;
+      }
+      throw err;
+    }
   }
 }

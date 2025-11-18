@@ -5,18 +5,26 @@ describe('Protected routes test', () => {
     cy.visit('/');
 
     cy.wait(2000)
+    cy.origin('https://dev-p17haprzong06zow.us.auth0.com/', () => {
 
-    // Check if the URL is redirected to the login page
-    cy.url().should('include', 'dev');
+      cy.contains('Log in to dev-p17haprzong06zow to continue to Snippet Searcher App').should('exist');
+
+      cy.url().should('include', 'auth0.com');
+    });
   });
 
   it('should display login content', () => {
     // Visit the login page
     cy.visit('/');
 
-    // Look for text that is likely to appear on a login page
-    cy.contains('continue').should('exist');
-    cy.get('input#password').should('exist'); // Adjust the text based on actual content
+      cy.origin('https://dev-p17haprzong06zow.us.auth0.com/', () => {
+
+          cy.contains('Continue').should('exist');
+
+          cy.contains('Email address').should('exist');
+
+          cy.contains('Password').should('exist');
+      });
   });
 
   it('should not redirect to login when the user is already authenticated', () => {

@@ -19,6 +19,7 @@ import {queryClient} from "../App.tsx";
 import {DeleteConfirmationModal} from "../components/snippet-detail/DeleteConfirmationModal.tsx";
 import {SnippetType} from "../types/snippetType.ts";
 import {useRunSnippet} from "../hooks/useRunSnippet.ts";
+import {AxiosError} from "axios";
 
 type SnippetDetailProps = {
   id: string;
@@ -59,9 +60,11 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false)
   const [testModalOpened, setTestModalOpened] = useState(false);
   const { run, stop, isRunning, data: codeOutput} = useRunSnippet();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 
   const {data: snippet, isLoading} = useGetSnippetById(id);
-  const {mutate: shareSnippet, isLoading: loadingShare} = useShareSnippet()
+  const {mutateAsync: shareSnippet, isLoading: loadingShare} = useShareSnippet()
   const {mutate: formatSnippet, isLoading: isFormatLoading, data: formatSnippetData} = useFormatSnippet()
   const {mutate: updateSnippet, isLoading: isUpdateSnippetLoading, isError: saveError} = useUpdateSnippetById({onSuccess: () => queryClient.invalidateQueries(['snippet', id])})
 
@@ -86,7 +89,19 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   }, [formatSnippetData])
 
   async function handleShareSnippet(userId: string) {
-    shareSnippet({snippetId: id, userId})
+    setErrorMessage(null);
+    try {
+       await shareSnippet({snippetId: id, userId})
+    }
+    catch (e) {
+      const err = e as AxiosError;
+      const data = err.response?.data as unknown;
+      const msg =
+          typeof data === 'string'
+              ? data
+              : (data as { message?: string })?.message ?? err.message;
+      setErrorMessage(msg);
+    }
   }
 
   return (
@@ -174,9 +189,13 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
             </Box>
           </>
         }
-        <ShareSnippetModal loading={loadingShare || isLoading} open={shareModalOpened}
-                           onClose={() => setShareModalOpened(false)}
-                           onShare={handleShareSnippet}/>
+        <ShareSnippetModal
+          loading={loadingShare || isLoading}
+          open={shareModalOpened}
+          onClose={() => { setShareModalOpened(false); setErrorMessage(null); }}
+          onShare={handleShareSnippet}
+          errorMessage={errorMessage}
+        />
         <TestSnippetModal open={testModalOpened} onClose={() => setTestModalOpened(false)} snippetId={id}/>
         <DeleteConfirmationModal open={deleteConfirmationModalOpen} onClose={() => setDeleteConfirmationModalOpen(false)} id={snippet?.id ?? ""} setCloseDetails={handleCloseModal} />
       </Box>

@@ -31,7 +31,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
     const [language, setLanguage] = useState(defaultSnippet?.language ?? "printscript");
     const [code, setCode] = useState(defaultSnippet?.snippet ?? "");
     const [snippetName, setSnippetName] = useState(defaultSnippet?.name ?? "")
-    const [description, setDescription] = useState(defaultSnippet?.description ?? "fake description");
+    const [description, setDescription] = useState(defaultSnippet?.description ?? "Some description...");
     const {mutateAsync: createSnippet, isLoading: loadingSnippet} = useCreateSnippet({
         onSuccess: () => queryClient.invalidateQueries('listSnippets')
     })
@@ -97,6 +97,24 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                 flexDirection: 'column',
                 gap: '16px'
             }}>
+                <InputLabel htmlFor="description">Description</InputLabel>
+                <Input
+                    onChange={e => setDescription(e.target.value)}
+                    value={description}
+                    id="description"
+                    sx={{
+                        width: '50%',
+                        '& input': {
+                            color: description === "Some description..." ? 'gray' : 'inherit'
+                        }
+                    }}
+                />
+            </Box>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+            }}>
                 <InputLabel htmlFor="name">Language</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
@@ -114,6 +132,7 @@ export const AddSnippetModal = ({open, onClose, defaultSnippet}: {
                     }
                 </Select>
             </Box>
+
             {saveError &&
                 <Typography color={"error"} variant={"body2"} ml={1}>
                     {saveErrorsList}

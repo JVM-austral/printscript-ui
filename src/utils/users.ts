@@ -1,10 +1,11 @@
 import {Pagination} from "./pagination.ts";
 
-export type PaginatedUsers = Pagination & {
+export type PaginatedUsers = {
+  pagination: Pagination,
   users: User[]
 }
 
 export type User = {
-  name: string,
+  email: string,
   id: string
 }

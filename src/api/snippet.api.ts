@@ -4,7 +4,6 @@ import {
     CreateSnippet,
     PaginatedSnippets,
     RunSnippet,
-    ShareSnippet,
     SnippetType,
     UpdateSnippet
 } from "../types/snippetType.ts";
@@ -29,11 +28,6 @@ export async function createSnippet(createSnippet: CreateSnippet ): Promise<Crea
 }
 export async function updateSnippet(updateSnippet :UpdateSnippet): Promise<CreateSnippetResponse> {
     const { data } = await apiClient.patch("/snippet-manager/snippets", updateSnippet);
-    return data;
-}
-
-export async function shareSnippet(shareSnippet :ShareSnippet) {
-    const { data } = await apiClient.post("/snippet-manager/snippets/share", shareSnippet);
     return data;
 }
 
