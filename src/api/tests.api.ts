@@ -11,8 +11,10 @@ export async function runSnippetTest(testCaseId: string): Promise<string> {
     return data;
 }
 
-export async function deleteSnippetTest(testCaseId: string): Promise<string> {
-    const { data } = await apiClient.delete(`/snippet-manager/testing/${testCaseId}`);
+export async function deleteSnippetTest(testId: string): Promise<string> {
+    const { data } = await apiClient.delete('/snippet-manager/testing', {
+        data: { testId }
+    });
     return data;
 }
 
