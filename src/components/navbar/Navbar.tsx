@@ -29,7 +29,7 @@ export const Navbar = () => {
     return (
         <AppBar position="static" elevation={0}>
             <Container maxWidth="xl">
-                <Toolbar disableGutters sx={{display: "flex", gap: "24px"}}>
+                <Toolbar disableGutters sx={{display: "flex", gap: "24px", color: 'white'}}>
                     <Typography
                         variant="h6"
                         noWrap
