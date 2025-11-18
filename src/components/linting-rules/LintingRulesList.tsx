@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
   Button,
+  capitalize,
   Card,
   Checkbox,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
   Typography
 } from '@mui/material';
@@ -33,10 +37,6 @@ const LintingRulesList = () => {
   const handleNumberChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value);
     handleValueChange(name, Number.isNaN(value) ? 0 : value);
-  };
-
-  const handleStringChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleValueChange(name, event.target.value);
   };
 
   const toggleBoolean = (name: string) => () => {
@@ -73,11 +73,16 @@ const LintingRulesList = () => {
                               onChange={handleNumberChange(name)}
                           />
                       ) : valueType === 'string' ? (
-                          <TextField
-                              variant="standard"
-                              value={value as string ?? ''}
-                              onChange={handleStringChange(name)}
-                          />
+                          <Select
+                              labelId={`select-${name}-label`}
+                              id={`select-${name}`}
+                              value={(value as string) ?? ''}
+                              label="Format"
+                              onChange={(e: SelectChangeEvent<string>) => handleValueChange(name, e.target.value)}
+                              sx={{ width: '15%' }}>
+                            <MenuItem data-testid="menu-option-snake_case" value="snake_case">Snake Case</MenuItem>
+                            <MenuItem data-testid="menu-option-camelCase" value="camelCase">{capitalize("Camel Case")}</MenuItem>
+                          </Select>
                       ) : null}
                     </ListItem>
                 );
