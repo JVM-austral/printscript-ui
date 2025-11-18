@@ -15,10 +15,6 @@ const router = createBrowserRouter([
         path: '/rules',
         element: <RulesScreen/>
     },
-    {
-        path: '/login'
-
-    }
 ]);
 
 export const queryClient = new QueryClient()
